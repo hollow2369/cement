@@ -73,7 +73,9 @@
       <!--   2-2: analysis data - input/output   -->
       <div class="analysis_content">
         <!--    2-2-1: upload component    -->
+
         <div class="upload_data">
+
           <el-upload
             ref="uploadRef"
             :auto-upload="false"
@@ -82,14 +84,30 @@
             :on-change="handleSuccess"
           >
             <template #trigger>
-              <el-button type="default" style="margin-right: 20px">上传文件</el-button>
 
+              <el-button type="default" style="margin-right: 20px">上传文件</el-button>
+              <!-- <el-option
+                v-for="item in this.dataList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option> -->
             </template>
-            <el-button type="primary" @click="handleUpload">
+            <el-button type="primary" style="margin-right: 20px" @click="handleUpload">
               文件解析
             </el-button>
+            <el-select v-model="date" placeholder="请选择日期" @change="handleChange">
+              <el-option
+                v-for="(item, index) in dateList"
+                :key="index"
+                :label="item"
+                :value="index">
+              </el-option>
+            </el-select>
           </el-upload>
+
         </div>
+        
         <!--    2-2-2: data wrap    -->
         <div class="data_wrap">
           <!--     2-2-2-1: input and output     -->
@@ -229,9 +247,31 @@ export default {
       // cement_data:cement_data.data[0]
       formData:{},
       formRules:{}, // 动态生成表单验证规则
+      dataList:[1],
+      dateList:[],
+      date: "",
+      selectedIndex: null, // 选中的索引
+      selectedDate: "", // 选中的日期
     }
   },
   methods:{
+    handleChange(selectedItem) {
+    // handleChange(value) {
+      // 查找完整的 item 并赋值给 date
+      // this.date = this.dateList.find(item => item === value) || "";
+      // console.log(this.date);
+      console.log(selectedItem, "ITEM");
+      this.date = selectedItem
+      // if (selectedItem) {
+      //   this.date = selectedItem.value; // 选中的日期
+      //   this.selectedIndex = selectedItem.index; // 选中的索引
+      // } else {
+      //   this.date = "";
+      //   this.selectedIndex = -1; // 设为 -1 表示未选择
+      // }
+      // console.log("选中的日期:", this.date);
+      // console.log("选中的索引:", this.selectedIndex);
+    },
     // 分页切换
     changeModel(title, index){
       this.title = title
@@ -244,7 +284,8 @@ export default {
     },
     // 处理上传文件
     async handleUpload(){
-		console.log("TEST");
+        console.log(this.uploadFiles[0]);
+      
         let file = this.uploadFiles[0]
         let reader = new FileReader()
     
@@ -259,45 +300,73 @@ export default {
             // 读取文件为 ArrayBuffer
             const arrayBuffer = await readAsArrayBuffer(file);
             // 将 ArrayBuffer 转换为 xlsx 工作簿
-            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            const workbook = XLSX.read(arrayBuffer, { type: 'array' , cellDates: true});
             // 假设您要读取第一个工作表
             const sheetName = workbook.SheetNames[0];
             const sheet = workbook.Sheets[sheetName];
     
             // 将工作表数据转换为 JSON 对象
-            const jsonData = XLSX.utils.sheet_to_json(sheet);
-    
-            const dataList = jsonData.map((row) => row);
-    
-            this.inputList.forEach((item, index) => {
-				// 获取键名为 12 的值
-				item.value = dataList[index]['数值'];
+            // const jsonData = XLSX.utils.sheet_to_json(sheet);
+            const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "NULL" });
+
+            const startRow = 3;
+
+            const dataList = jsonData.slice(startRow);
+            console.log(dataList);
+            
+            this.dataList = dataList
+            // this.dateList = this.dataList.map(item => item[0]);
+            this.dateList = this.dataList.map(item => {
+              
+              // return new Date(item[0]+1).toLocaleDateString('zh-CN'); // 按照中国标准格式化日期
+              let date = new Date(item[0]);  // 确保 item[0] 是有效的 Date 对象
+              date.setDate(date.getDate() + 1);  // 日期加一天
+              return date.toLocaleDateString('zh-CN'); // 格式化为中文日期
             });
-            // 读取txt
-            // this.tempFile = await readAsText(file);
-            // const lines = this.tempFile.split("\n");
-            // console.log(this.tempFile)
-            // const dataList = []
-            // lines.forEach((line) => {
-            //   // 将每行数据按逗号分割成两部分
-            //   const parts = line.split(',');
-            //   // 提取第二部分的数值并转换为浮点数
-            //   dataList.push(parseFloat(parts[1]));
-            // });
-            // this.inputList.forEach((item, index)=>{
-            //   item.value = dataList[index];
+            // this.dataList.forEach(item=>{
+            //   console.log(item.slice(0,1));
+            //   // let temp = [...item[0]]
+            //   // console.log(temp);
+              
+            //   this.dateList.push(item.slice(0,1))
             // })
-        } catch (error) {
-			console.error('读取文件失败:', error);
-        }
-    },
+            this.dateList.map((item, index) => {
+              console.log(`索引 ${index}，值: ${item}`);
+            });
+            
+            // const dataList = jsonData.map((row) => row);
+            // console.log("datalist", dataList[0]);
+            
+            this.inputList.forEach((item, index) => {
+                  // 获取键名为 12 的值
+                  item.value = dataList[index]['数值'];
+            });
+                  // 读取txt
+                  // this.tempFile = await readAsText(file);
+                  // const lines = this.tempFile.split("\n");
+                  // console.log(this.tempFile)
+                  // const dataList = []
+                  // lines.forEach((line) => {
+                  //   // 将每行数据按逗号分割成两部分
+                  //   const parts = line.split(',');
+                  //   // 提取第二部分的数值并转换为浮点数
+                  //   dataList.push(parseFloat(parts[1]));
+                  // });
+                  // this.inputList.forEach((item, index)=>{
+                  //   item.value = dataList[index];
+                  // })
+              } catch (error) {
+            console.error('读取文件失败:', error);
+            }
+            },
     // 上传成功的处理
     handleSuccess(file, fileList){
       this.uploadFiles = fileList
     },
     createChart(param, values){
       const myChart = echarts.init(param);
-      let percentage = (values * 100).toFixed(1);
+      let percentage = (values).toFixed(1);
+      // let percentage = (values * 100).toFixed(1);
       const option = {
         title: {
           text: percentage + "%" ,
@@ -390,8 +459,8 @@ export default {
 				thermalEfficiencyList:[]
 			}
 		}
-		data.massStreamRatioList.push(result[0])
-		data.thermalEfficiencyList.push(result[1])
+		// data.massStreamRatioList.push(result[0])
+		// data.thermalEfficiencyList.push(result[1])
 		this.saveLocalStorageData(key, data)	
 	},
 	// 加载数据
@@ -400,51 +469,121 @@ export default {
 		return dataList
 	},
     starCalculate(){
-      console.log(this.formRules)
-      this.$refs.inputForm.validate((valid)=>{
-        console.log("before validate")
-        // 通过验证
-        if(valid){
-			console.log("start validate")
-			let params = []
-			this.inputList.forEach((item)=>{
-				params.push(item.value)
-			})
-			let result
-			switch(this.flow){    
-				case "PH_Boiler":
-					result =  fun1(...params)
-					break
-				case "SuspensionPreheater":
-					result =  fun2(...params)
-					break
-				case "StratifiedFurnace":
-					result =  fun3(...params)
-					break
-				case "RotaryKiln":
-					result =  fun4(...params)
-					break
-				case "Cooler":
-					result =  fun5(...params)
-					break
-				case "AQCBoilder":
-					result =  fun6(...params)
-					break
-				default:
-					result = fun1(...params)
-					break
+      // console.log(this.formRules)
+      console.log("dataList cal");
+      
+      const argList_PH = this.dataList[this.date].slice(1, 36)
+      const result_PH = fun1(...argList_PH)
+      console.log(result_PH, "ARG_PH");
+      
+      const argList_SP = [...this.dataList[this.date].slice(36, 49), ...result_PH[1]]
+      const result_SP = fun2(...argList_SP)
+      console.log(result_SP, "result ARG_SP");
+      
+      const argList_SF = [...this.dataList[this.date].slice(49, 96), ...result_SP[1]]
+      const result_SF = fun3(...argList_SF)
+
+      const argList_RK = [...this.dataList[this.date].slice(96, 121), ...result_SF[1]]
+      const result_RK = fun4(...argList_RK)
+
+      const argList_C = [...this.dataList[this.date].slice(121, 140), ...result_RK[1]]
+      const result_C = fun5(...argList_C) 
+      
+      const argList_AQC = [...this.dataList[this.date].slice(140, 151), ...result_C[1]]
+      const result_AQC = fun6(...argList_AQC) 
+      console.log(argList_AQC);
+      console.log(result_AQC);
+      
+
+      switch(this.flow){    
+        case "PH_Boiler":
+          this.createChart(this.$refs.pieChart1, result_PH[2][0])
+          this.createChart(this.$refs.pieChart2, result_PH[2][1])
+          this.createChart(this.$refs.pieChart3, (1 - result_PH[2][1]))
+          break
+        case "SuspensionPreheater":
+        
+          this.createChart(this.$refs.pieChart1, result_SP[2][0])
+          this.createChart(this.$refs.pieChart2, result_SP[2][1])
+          this.createChart(this.$refs.pieChart3, (1 - result_SP[2][1]))
+          break
+        case "StratifiedFurnace":
+          this.createChart(this.$refs.pieChart1, result_SF[0][0])
+          this.createChart(this.$refs.pieChart2, result_SF[0][1])
+          this.createChart(this.$refs.pieChart3, (1 - result_SF[0][1]))
+          break
+        case "RotaryKiln":
+          this.createChart(this.$refs.pieChart1, result_RK[0][0])
+          this.createChart(this.$refs.pieChart2, result_RK[0][1])
+          this.createChart(this.$refs.pieChart3, (1 - result_RK[0][1]))
+          break
+        case "Cooler":
+          this.createChart(this.$refs.pieChart1, result_C[0][0])
+          this.createChart(this.$refs.pieChart2, result_C[0][1])
+          this.createChart(this.$refs.pieChart3, (1 - result_C[0][1]))
+          break
+        case "AQCBoilder":
+          this.createChart(this.$refs.pieChart1, result_AQC[0][0])
+          this.createChart(this.$refs.pieChart2, result_AQC[0][1])
+          this.createChart(this.$refs.pieChart3, (1 - result_AQC[0][1]))
+          break
+        default:
+          this.createChart(this.$refs.pieChart1, result_PH[2][0])
+          this.createChart(this.$refs.pieChart2, result_PH[2][1])
+          this.createChart(this.$refs.pieChart3, (1 - result_PH[2][1]))
+          break
 			}
-			this.createChart(this.$refs.pieChart1, result[0])
-			this.createChart(this.$refs.pieChart2, result[1])
-			this.createChart(this.$refs.pieChart3, (1 - result[1]))
+
+      // this.$refs.inputForm.validate((valid)=>{
+      //   console.log("before validate")
+      //   // 通过验证
+      //   if(valid){
+      //     console.log("start validate")
+      //     let params = []
+      //     this.inputList.forEach((item)=>{
+      //       params.push(item.value)
+      //     })
+
+
+			// let result
+
+			// switch(this.flow){    
+			// 	case "PH_Boiler":
+			// 		result =  fun1(...params)
+			// 		break
+			// 	case "SuspensionPreheater":
+			// 		result =  fun2(...params)
+			// 		break
+			// 	case "StratifiedFurnace":
+			// 		result =  fun3(...params)
+			// 		break
+			// 	case "RotaryKiln":
+			// 		result =  fun4(...params)
+			// 		break
+			// 	case "Cooler":
+			// 		result =  fun5(...params)
+			// 		break
+			// 	case "AQCBoilder":
+			// 		result =  fun6(...params)
+			// 		break
+			// 	default:
+			// 		result = fun1(...params)
+			// 		break
+			// }
+
+
+
+			// this.createChart(this.$refs.pieChart1, result[0])
+			// this.createChart(this.$refs.pieChart2, result[1])
+			// this.createChart(this.$refs.pieChart3, (1 - result[1]))
 			// localStorage
-			this.updateLocalStorageData(this.flow, result)
-        }else{
-          this.$message.error('请填写非0的数值信息');
-          this.$refs.inputForm.clearValidate(); // 清空表单项的错误信息
-          console.log("error validate")
-        }
-      })
+			// this.updateLocalStorageData(this.flow, result_AQC)
+        // }else{
+          // this.$message.error('请填写非0的数值信息');
+          // this.$refs.inputForm.clearValidate(); // 清空表单项的错误信息
+          // console.log("error validate")
+      //   }
+      // })
 
     }
   },
@@ -536,6 +675,7 @@ html {
   height: 8vh;
   box-sizing: border-box;
   margin-bottom: 10px;
+  display: flex;
 }
 .data_wrap{
   width: 100%;

@@ -26,9 +26,9 @@
 // const waterVaporDensity = 0.6;
 // const oxygenDensity = 1.429;
 // const nitrogenDensity = 0.81;
-const standardAirDensity = 1.293; // 标准情况下的空气密度
+// const standardAirDensity = 1.293; // 标准情况下的空气密度
 //---------------------------------------------------------------------------------------------
-const standardAirSpecificHeat = 1009;
+// const standardAirSpecificHeat = 1009;
 // 各个一次空气的比热
 // const carbonMonoxideSpecificHeatFirst = 1040;
 // const carbonDioxideSpecificHeatFirst = 840;
@@ -56,154 +56,163 @@ const standardAirSpecificHeat = 1009;
 
 // 1.进入节点的物质流总量
 export function fun3(
-    hourlyCoalPowder, 
-	hourlySendCoalAirVolume,
-	hourlyThirdAirVolume,
-	carbonMonoxideVolumeFractionThird,
-	carbonDioxideVolumeFractionThird, 
-	oxygenVolumeFractionThird, 
-	nitrogenVolumeFractionThird,
-	ThirdAirDustContent,
-	hourlyLeakageVolume,
-	hourlyWasterGasVolume,
-	carbonMonoxideVolumeFractionWasterGas,
-	carbonDioxideVolumeFractionWasterGas, 
-	oxygenVolumeFractionWasterGas, 
-	nitrogenVolumeFractionWasterGas,
-	ashContent,
-	coalPowderTemperature,
-	thirdAirTemperature,
-	airTemperature,
-	coalHeatingValue,
-	wasterGasTemperature,
-	hourlyRawMaterial, 
-	rawMaterialTemperature,
-	ashLoss,
-	rawMaterialLoss, 
-	rawMaterialWaterContent, 
-	magnesiumOxideContent, 
-	calciumOxideContent,
-	coalPowderSpecificHeat,
-	carbonMonoxideDensityThird, 
-	carbonDioxideDensityThird, 
-	oxygenDensityThird, 
-	nitrogenDensityThird,	
-	carbonMonoxideSpecificHeatThird,
-	carbonDioxideSpecificHeatThird, 
-	oxygenSpecificHeatThird, 
-	nitrogenSpecificHeatThird,
-	carbonMonoxideDensityWasterGas,
-	carbonDioxideDensityWasterGas, 
-	oxygenDensityWasterGas, 
-	nitrogenDensityWasterGas, 
-	carbonMonoxideSpecificHeatWasterGas,
-	carbonDioxideSpecificHeatWasterGas, 
-	oxygenSpecificHeatWasterGas, 
-	nitrogenSpecificHeatWasterGas, 
-	ashSpecificHeat,
-	rawMaterialSpecificHeat,
-	hourlyClinkerProduction, 
-	ashDensity, 
-	hourlyOthersMass,
-	sendCoalAirTemperature, 
-	clinkerSpecificHeat, 
-	othersSpecificHeat, 
-	othersTemperature, 
-	othersHeatingValue,
-	hourlyLeavingCoalPowder,
+    hourlyClinkerProduction,
+    hourlyCoalPowder,
+    hourlySendCoalAirVolume,
+    standardAirDensity,
+    hourlyThirdAirVolume,
+    thirdAirDensity,
+    hourlyLeakageVolume,
+    airDensity,
+    hourlySecondAirVolume,
+    hourlyFirstAirVolumeRK,
+    carbonDioxideVolumeFractionWasterGasRK, 
+    carbonMonoxideVolumeFractionWasterGasRK, 
+    oxygenVolumeFractionWasterGasRK, 
+    nitrogenVolumeFractionWasterGasRK,
+    carbonDioxideDensityWasterGasRK, 
+    carbonMonoxideDensityWasterGasRK, 
+    oxygenDensityWasterGasRK, 
+    nitrogenDensityWasterGasRK,
+    hourlyOthersMass,
+    coalPowderSpecificHeat,
+    coalPowderTemperature,
+    standardAirSpecificHeat,
+    sendCoalAirTemperature,
+    thirdAirSpecificHeat,
+    thirdAirTemperature, 
+    envTemperature,
+    coalHeatingValue,
+    carbonDioxideVolumeFractionWasterGas,
+    carbonMonoxideVolumeFractionWasterGas,
+    oxygenVolumeFractionWasterGas,
+    nitrogenVolumeFractionWasterGas,
+    carbonDioxideSpecificHeatWasterGas,
+    carbonMonoxideSpecificHeatWasterGas,
+    oxygenSpecificHeatWasterGas, 
+    nitrogenSpecificHeatWasterGas,
+    wasterGasTemperature,
+    othersSpecificHeat,
+    othersTemperature,
+    othersHeatingValue,
+    hourlyRawMaterial,
+    calciumOxideContent,
+    magnesiumOxideContent,
+    rawMaterialSpecificHeat,
+    rawMaterialTemperature,
+    ashBurnLoss,
+    rawMaterialBurnLoss, 
+    rawMaterialWaterContent,
+
+    rawMaterialMassStreamSP,
+    rawMaterialSensibleSP,
+    wasterGasMassStreamSP, 
+    ashMassStreamSP,
+    wasterGasSensibleSP, 
+    ashSensibleSP
 ){
-    let totalEnteringMassStream = cal_total_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, hourlySendCoalAirVolume, hourlyThirdAirVolume, hourlyRawMaterial, hourlyLeakageVolume, hourlyWasterGasVolume, ashDensity, ThirdAirDustContent, carbonMonoxideDensityThird, carbonDioxideDensityThird, oxygenDensityThird, nitrogenDensityThird, carbonMonoxideVolumeFractionThird, carbonDioxideVolumeFractionThird, oxygenVolumeFractionThird, nitrogenVolumeFractionThird, carbonMonoxideDensityWasterGas, carbonDioxideDensityWasterGas, oxygenDensityWasterGas, nitrogenDensityWasterGas, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, ashContent, hourlyOthersMass);
-    let totalEnteringSensible = cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderTemperature, coalPowderSpecificHeat, hourlySendCoalAirVolume, sendCoalAirTemperature, hourlyThirdAirVolume, thirdAirTemperature, carbonMonoxideVolumeFractionThird, carbonDioxideVolumeFractionThird, oxygenVolumeFractionThird, nitrogenVolumeFractionThird, carbonMonoxideSpecificHeatThird, carbonDioxideSpecificHeatThird, oxygenSpecificHeatThird, nitrogenSpecificHeatThird, clinkerSpecificHeat, hourlyRawMaterial, rawMaterialTemperature, rawMaterialWaterContent, hourlyLeakageVolume, airTemperature, coalHeatingValue, hourlyWasterGasVolume, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas, ashDensity, ashContent, ashSpecificHeat, hourlyOthersMass, othersSpecificHeat, othersTemperature, othersHeatingValue, ThirdAirDustContent)
-    let totalLeavingMassStream = cal_total_massStream_leavingNode(hourlyLeavingCoalPowder, hourlyClinkerProduction, hourlyWasterGasVolume, carbonMonoxideDensityWasterGas, carbonDioxideDensityWasterGas, oxygenDensityWasterGas, nitrogenDensityWasterGas, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, ashContent)
-    let totalLeavingSensible = cal_total_energyStream_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, rawMaterialSpecificHeat, rawMaterialTemperature, hourlyWasterGasVolume, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas, ashDensity, ashContent, ashSpecificHeat, ashLoss, rawMaterialLoss, rawMaterialWaterContent, magnesiumOxideContent, calciumOxideContent, hourlyCoalPowder)
+    let totalEnteringMassStream = cal_total_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, hourlySendCoalAirVolume, hourlyThirdAirVolume, thirdAirDensity, hourlyLeakageVolume, standardAirDensity, hourlySecondAirVolume, hourlyFirstAirVolumeRK, carbonMonoxideDensityWasterGasRK, carbonDioxideDensityWasterGasRK, oxygenDensityWasterGasRK, nitrogenDensityWasterGasRK, carbonMonoxideVolumeFractionWasterGasRK, carbonDioxideVolumeFractionWasterGasRK, oxygenVolumeFractionWasterGasRK, nitrogenVolumeFractionWasterGasRK, hourlyOthersMass, rawMaterialMassStreamSP);
+    let totalEnteringSensible = cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderTemperature, coalPowderSpecificHeat, hourlySendCoalAirVolume,standardAirSpecificHeat, sendCoalAirTemperature, hourlyThirdAirVolume, thirdAirSpecificHeat, thirdAirTemperature, rawMaterialSensibleSP, hourlyLeakageVolume, envTemperature, coalHeatingValue, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas, hourlyOthersMass, othersSpecificHeat, othersTemperature, othersHeatingValue, hourlySecondAirVolume, hourlyFirstAirVolumeRK)
+    let totalLeavingMassStream = cal_total_massStream_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, calciumOxideContent, magnesiumOxideContent, wasterGasMassStreamSP, ashMassStreamSP)
+    let totalLeavingSensible = cal_total_energyStream_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, rawMaterialMassStreamSP, wasterGasSensibleSP, ashSensibleSP, ashMassStreamSP, calciumOxideContent, magnesiumOxideContent, ashBurnLoss, rawMaterialBurnLoss, rawMaterialWaterContent)
 
     // 可计算物质流损失比和热效率
     let massStreamRatio = totalLeavingMassStream / totalEnteringMassStream * 100;
     let thermalEfficiency = totalLeavingSensible / totalEnteringSensible * 100;
 
-    return [massStreamRatio, thermalEfficiency, totalEnteringMassStream, totalEnteringSensible, totalLeavingMassStream, totalLeavingSensible];
+    // temp
+
+    let leakageMassStreamSF = cal_leakage_massStream_enteringNode(hourlyLeakageVolume, hourlyClinkerProduction, standardAirDensity)
+    let rawMaterialSensibleSF = cal_rawMaterial_sensible_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, rawMaterialMassStreamSP)
+    let wasterGasMassStreamSF = cal_wasterGas_massStream_leavingNode(wasterGasMassStreamSP)
+    let wasterGasSensibleSF = cal_wasterGas_sensible_leavingNode(wasterGasSensibleSP)
+    let coalPowderBurningSensible = cal_coalPowderBurning_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalHeatingValue)
+    let thirdAirMassStreamSF = cal_thirdAir_massStream_enteringNode(hourlyThirdAirVolume, hourlyClinkerProduction, thirdAirDensity)
+
+    console.log("ARG", ashMassStreamSP);
+    
+    return [
+        [massStreamRatio, thermalEfficiency], 
+        [leakageMassStreamSF, rawMaterialSensibleSF, wasterGasMassStreamSF, wasterGasSensibleSF, coalPowderBurningSensible, ashSensibleSP, thirdAirMassStreamSF], 
+        [totalEnteringMassStream, totalEnteringSensible, totalLeavingMassStream, totalLeavingSensible]
+    ];
 }
 // (success)1
-function cal_total_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, hourlySendCoalAirVolume, hourlyThirdAirVolume, hourlyRawMaterial, hourlyLeakageVolume, hourlyWasterGasVolume, ashDensity, ThirdAirDustContent, carbonMonoxideDensityThird, carbonDioxideDensityThird, oxygenDensityThird, nitrogenDensityThird, carbonMonoxideVolumeFractionThird, carbonDioxideVolumeFractionThird, oxygenVolumeFractionThird, nitrogenVolumeFractionThird, carbonMonoxideDensityWasterGas, carbonDioxideDensityWasterGas, oxygenDensityWasterGas, nitrogenDensityWasterGas, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, ashContent, hourlyOthersMass){
+function cal_total_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, hourlySendCoalAirVolume, hourlyThirdAirVolume, thirdAirDensity, hourlyLeakageVolume, standardAirDensity, hourlySecondAirVolume, hourlyFirstAirVolumeRK, carbonMonoxideDensityWasterGasRK, carbonDioxideDensityWasterGasRK, oxygenDensityWasterGasRK, nitrogenDensityWasterGasRK, carbonMonoxideVolumeFractionWasterGasRK, carbonDioxideVolumeFractionWasterGasRK, oxygenVolumeFractionWasterGasRK, nitrogenVolumeFractionWasterGasRK, hourlyOthersMass, rawMaterialMassStreamSP){
     let coalPowderMassStream = cal_coalPowder_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction)
-    let sendCoalAirMassStream = cal_sendCoalAir_massStream_enteringNode(hourlySendCoalAirVolume, hourlyClinkerProduction)
-    let thirdAirMassStream = cal_thirdAir_massStream_enteringNode(hourlyThirdAirVolume, hourlyClinkerProduction, ThirdAirDustContent, carbonMonoxideDensityThird, carbonDioxideDensityThird, oxygenDensityThird, nitrogenDensityThird, carbonMonoxideVolumeFractionThird, carbonDioxideVolumeFractionThird, oxygenVolumeFractionThird, nitrogenVolumeFractionThird)
-    let rawMaterialMassStream = cal_rawMaterial_massStream_enteringNode(hourlyRawMaterial, hourlyClinkerProduction)
-    let leakageMassStream = cal_leakage_massStream_enteringNode(hourlyLeakageVolume, hourlyClinkerProduction)
-    let wasterGasMassStream = cal_wasterGas_massStream_enteringNode(hourlyWasterGasVolume, hourlyClinkerProduction, carbonMonoxideDensityWasterGas, carbonDioxideDensityWasterGas, oxygenDensityWasterGas, nitrogenDensityWasterGas, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas)
-    let ashMassStream = cal_ash_massStream_enteringNode(hourlyWasterGasVolume, hourlyClinkerProduction, ashContent)
-	let othersMassStream = cal_others_massStream_enteringNode(hourlyOthersMass, hourlyClinkerProduction);
+    let sendCoalAirMassStream = cal_sendCoalAir_massStream_enteringNode(hourlySendCoalAirVolume, hourlyClinkerProduction, standardAirDensity)
+    let thirdAirMassStream = cal_thirdAir_massStream_enteringNode(hourlyThirdAirVolume, hourlyClinkerProduction, thirdAirDensity)
+    let rawMaterialMassStream = cal_rawMaterial_massStream_enteringNode(rawMaterialMassStreamSP)
+    let leakageMassStream = cal_leakage_massStream_enteringNode(hourlyLeakageVolume, hourlyClinkerProduction, standardAirDensity)
+    let wasterGasMassStream = cal_wasterGas_massStream_enteringNode(hourlySecondAirVolume, hourlyFirstAirVolumeRK, hourlyClinkerProduction, carbonMonoxideDensityWasterGasRK, carbonDioxideDensityWasterGasRK, oxygenDensityWasterGasRK, nitrogenDensityWasterGasRK, carbonMonoxideVolumeFractionWasterGasRK, carbonDioxideVolumeFractionWasterGasRK, oxygenVolumeFractionWasterGasRK, nitrogenVolumeFractionWasterGasRK)
+	let othersMassStream = cal_others_massStream_enteringNode(hourlyOthersMass, hourlyClinkerProduction)
 
-    let totalEnteringNodeMassStream = coalPowderMassStream + sendCoalAirMassStream + thirdAirMassStream + rawMaterialMassStream + leakageMassStream + wasterGasMassStream + ashMassStream + othersMassStream;
+    console.log("SF", coalPowderMassStream, sendCoalAirMassStream, thirdAirMassStream, rawMaterialMassStream, leakageMassStream, wasterGasMassStream, othersMassStream);
+    
+    let totalEnteringNodeMassStream = coalPowderMassStream + sendCoalAirMassStream + thirdAirMassStream + rawMaterialMassStream + leakageMassStream + wasterGasMassStream + othersMassStream;
+    // let totalEnteringNodeMassStream = coalPowderMassStream + sendCoalAirMassStream + thirdAirMassStream + rawMaterialMassStream + leakageMassStream + wasterGasMassStream;
     return totalEnteringNodeMassStream;
 }
-// (success)1-1:煤粉进入的物质流
+// [PASS] 2-48 (success)1-1:煤粉进入的物质流
 function cal_coalPowder_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction){
     let coalPowderMassStream = hourlyCoalPowder / hourlyClinkerProduction;
     return coalPowderMassStream;
 }
-// (success)1-2:一次空气的物质流
-function cal_sendCoalAir_massStream_enteringNode(hourlySendCoalAirVolume, hourlyClinkerProduction){
+// [PASS] 2-49 (success)1-2:一次空气的物质流 -> 送煤空气
+function cal_sendCoalAir_massStream_enteringNode(hourlySendCoalAirVolume, hourlyClinkerProduction, standardAirDensity){
     let sendCoalAirMassStream = hourlySendCoalAirVolume * standardAirDensity / hourlyClinkerProduction;
     return sendCoalAirMassStream;
 }
-// (success)1-3:三次空气的物质流
-function cal_thirdAir_massStream_enteringNode(hourlyThirdAirVolume, hourlyClinkerProduction, ThirdAirDustContent, carbonMonoxideDensityThird, carbonDioxideDensityThird, oxygenDensityThird, nitrogenDensityThird, carbonMonoxideVolumeFractionThird, carbonDioxideVolumeFractionThird, oxygenVolumeFractionThird, nitrogenVolumeFractionThird){
-    let thirdAirDensity = (
-        carbonMonoxideDensityThird * carbonMonoxideVolumeFractionThird +
-        carbonDioxideDensityThird * carbonDioxideVolumeFractionThird+
-        oxygenDensityThird * oxygenVolumeFractionThird +
-        nitrogenDensityThird * nitrogenVolumeFractionThird) / 100;
-	let DustMassStream = hourlyThirdAirVolume * ThirdAirDustContent / hourlyClinkerProduction
-    let thirdAirMassStream = (hourlyThirdAirVolume * thirdAirDensity / hourlyClinkerProduction) + DustMassStream;
+// [PASS] 2-51 (success)1-3:三次空气的物质流
+function cal_thirdAir_massStream_enteringNode(hourlyThirdAirVolume, hourlyClinkerProduction, thirdAirDensity){
+	// let DustMassStream = hourlyThirdAirVolume * ThirdAirDustContent / hourlyClinkerProduction
+	let DUSTMASSSTREAM = 0
+    let thirdAirMassStream = (hourlyThirdAirVolume * thirdAirDensity / hourlyClinkerProduction) + DUSTMASSSTREAM;
     return thirdAirMassStream;
 }
-// (success)1-4:出口生料的物质流
-function cal_rawMaterial_massStream_enteringNode(hourlyRawMaterial, hourlyClinkerProduction){
-    let rawMaterialMassStream = hourlyRawMaterial / hourlyClinkerProduction;
-    return rawMaterialMassStream;
+// [CHANGE] (success)1-4:出口生料的物质流
+function cal_rawMaterial_massStream_enteringNode(rawMaterialMassStreamSP){
+    return rawMaterialMassStreamSP;
 }
-// (success)1-5:漏风的物质流
-function cal_leakage_massStream_enteringNode(hourlyLeakageVolume, hourlyClinkerProduction){
+// [PASS] 2-53(success)1-5:漏风的物质流
+function cal_leakage_massStream_enteringNode(hourlyLeakageVolume, hourlyClinkerProduction, standardAirDensity){
     // 使用标准空气的密度
     let leakageMassStream = hourlyLeakageVolume * standardAirDensity / hourlyClinkerProduction;
     return leakageMassStream;
 }
 // (success)1-6:窑尾的废气的物质流
-function cal_wasterGas_massStream_enteringNode(hourlyWasterGasVolume, hourlyClinkerProduction, carbonMonoxideDensityWasterGas, carbonDioxideDensityWasterGas, oxygenDensityWasterGas, nitrogenDensityWasterGas, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas){
+function cal_wasterGas_massStream_enteringNode(hourlySecondAirVolume, hourlyFirstAirVolumeRK, hourlyClinkerProduction, carbonMonoxideDensityWasterGasRK, carbonDioxideDensityWasterGasRK, oxygenDensityWasterGasRK, nitrogenDensityWasterGasRK, carbonMonoxideVolumeFractionWasterGasRK, carbonDioxideVolumeFractionWasterGasRK, oxygenVolumeFractionWasterGasRK, nitrogenVolumeFractionWasterGasRK){
     let wasterGasDensity = (
-        carbonMonoxideDensityWasterGas * carbonMonoxideVolumeFractionWasterGas +
-        carbonDioxideDensityWasterGas * carbonDioxideVolumeFractionWasterGas+
-        oxygenDensityWasterGas * oxygenVolumeFractionWasterGas +
-        nitrogenDensityWasterGas * nitrogenVolumeFractionWasterGas) / 100;
+        carbonMonoxideDensityWasterGasRK * carbonMonoxideVolumeFractionWasterGasRK +
+        carbonDioxideDensityWasterGasRK * carbonDioxideVolumeFractionWasterGasRK +
+        oxygenDensityWasterGasRK * oxygenVolumeFractionWasterGasRK +
+        nitrogenDensityWasterGasRK * nitrogenVolumeFractionWasterGasRK) / 100;
 
-    let wasterGasMassStream = hourlyWasterGasVolume * wasterGasDensity / hourlyClinkerProduction;
+    let wasterGasVolume = hourlySecondAirVolume + hourlyFirstAirVolumeRK
+
+    let wasterGasMassStream = wasterGasVolume * wasterGasDensity / hourlyClinkerProduction;
     return wasterGasMassStream
 }
-// (success)1-7:窑尾的飞灰的物质流
-function cal_ash_massStream_enteringNode(hourlyWasterGasVolume, hourlyClinkerProduction, ashContent){
-    let ashMassStream = hourlyWasterGasVolume * ashContent / hourlyClinkerProduction;
-    return ashMassStream;
-}
+
 // (success)1-8:其他燃料
 function cal_others_massStream_enteringNode(hourlyOthersMass, hourlyClinkerProduction){
 	let othersMassStream = hourlyOthersMass / hourlyClinkerProduction;
 	return othersMassStream;
 }
 // 2.进入冷却炉的能量流
-function cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderTemperature, coalPowderSpecificHeat, hourlySendCoalAirVolume, sendCoalAirTemperature, hourlyThirdAirVolume, thirdAirTemperature, carbonMonoxideVolumeFractionThird, carbonDioxideVolumeFractionThird, oxygenVolumeFractionThird, nitrogenVolumeFractionThird, carbonMonoxideSpecificHeatThird, carbonDioxideSpecificHeatThird, oxygenSpecificHeatThird, nitrogenSpecificHeatThird, clinkerSpecificHeat, hourlyRawMaterial, rawMaterialTemperature, rawMaterialWaterContent, hourlyLeakageVolume, airTemperature, coalHeatingValue, hourlyWasterGasVolume, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas, ashDensity, ashContent, ashSpecificHeat, hourlyOthersMass, othersSpecificHeat, othersTemperature, othersHeatingValue, ThirdAirDustContent){
+function cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderTemperature, coalPowderSpecificHeat, hourlySendCoalAirVolume,standardAirSpecificHeat, sendCoalAirTemperature, hourlyThirdAirVolume, thirdAirSpecificHeat, thirdAirTemperature, rawMaterialSensibleSP, hourlyLeakageVolume, envTemperature, coalHeatingValue, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas, hourlyOthersMass, othersSpecificHeat, othersTemperature, othersHeatingValue, hourlySecondAirVolume, hourlyFirstAirVolumeRK){
     let coalPowderSensible = cal_coalPowder_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderTemperature, coalPowderSpecificHeat);
-    let sendCoalAirSensible = cal_sendCoalAir_sensible_enteringNode(hourlySendCoalAirVolume, hourlyClinkerProduction, sendCoalAirTemperature)
-    let thirdAirSensible = cal_thirdAir_sensible_enteringNode(hourlyThirdAirVolume, hourlyClinkerProduction, thirdAirTemperature, carbonMonoxideVolumeFractionThird, carbonDioxideVolumeFractionThird, oxygenVolumeFractionThird, nitrogenVolumeFractionThird, carbonMonoxideSpecificHeatThird, carbonDioxideSpecificHeatThird, oxygenSpecificHeatThird, nitrogenSpecificHeatThird, clinkerSpecificHeat, ThirdAirDustContent);
-    let rawMaterialSensible = cal_rawMaterial_sensible_enteringNode(hourlyRawMaterial, hourlyClinkerProduction, rawMaterialTemperature, rawMaterialWaterContent);
-    let leakageSensible = cal_leakage_sensible_enteringNode(hourlyLeakageVolume, hourlyClinkerProduction, airTemperature)
+    let sendCoalAirSensible = cal_sendCoalAir_sensible_enteringNode(hourlySendCoalAirVolume, hourlyClinkerProduction, standardAirSpecificHeat, sendCoalAirTemperature);
+    let thirdAirSensible = cal_thirdAir_sensible_enteringNode(hourlyThirdAirVolume, hourlyClinkerProduction, thirdAirSpecificHeat, thirdAirTemperature);
+    let rawMaterialSensible = cal_rawMaterial_sensible_enteringNode(rawMaterialSensibleSP);
+    let leakageSensible = cal_leakage_sensible_enteringNode(hourlyLeakageVolume, hourlyClinkerProduction, standardAirSpecificHeat, envTemperature)
     let coalPowderBurningSensible = cal_coalPowderBurning_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalHeatingValue)
-    let wasterGasSensible = cal_wasterGas_sensible_enteringNode(hourlyWasterGasVolume, hourlyClinkerProduction, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas)
-    let ashSensible = cal_ash_sensible_enteringNode(hourlyWasterGasVolume, hourlyClinkerProduction, ashDensity, ashContent, ashSpecificHeat, wasterGasTemperature)
-	let othersSensible = cal_others_sensible_enteringNode(hourlyOthersMass, hourlyClinkerProduction, othersSpecificHeat, othersTemperature)
-	let othersBurningSebsible = cal_othersBurning_sensible_enteringNode(hourlyOthersMass, hourlyClinkerProduction, othersHeatingValue)
+    let wasterGasSensible = cal_wasterGas_sensible_enteringNode(hourlyClinkerProduction, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas, hourlySecondAirVolume, hourlyFirstAirVolumeRK)
 	
-    let totalEnteringNodeSensible = coalPowderSensible + sendCoalAirSensible + thirdAirSensible + rawMaterialSensible + leakageSensible + coalPowderBurningSensible + wasterGasSensible + ashSensible + othersSensible + othersBurningSebsible
+    let othersSensible = cal_others_sensible_enteringNode(hourlyOthersMass, hourlyClinkerProduction, othersSpecificHeat, othersTemperature)
+    let othersBurningSensible = cal_othersBurning_sensible_enteringNode(hourlyOthersMass, hourlyClinkerProduction, othersHeatingValue)
+
+    let totalEnteringNodeSensible = coalPowderSensible + sendCoalAirSensible + thirdAirSensible + rawMaterialSensible + leakageSensible + coalPowderBurningSensible + wasterGasSensible + othersSensible + othersBurningSensible
     return totalEnteringNodeSensible;
 }
 // (success)2-1
@@ -213,146 +222,121 @@ function cal_coalPowder_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerPro
     return coalPowderSensible;
 }
 // (success)2-2：送煤空气
-function cal_sendCoalAir_sensible_enteringNode(hourlySendCoalAirVolume, hourlyClinkerProduction, sendCoalAirTemperature){
+function cal_sendCoalAir_sensible_enteringNode(hourlySendCoalAirVolume, hourlyClinkerProduction, standardAirSpecificHeat, sendCoalAirTemperature){
     let sendCoalAirSensible = hourlySendCoalAirVolume * standardAirSpecificHeat * sendCoalAirTemperature / hourlyClinkerProduction;
     return sendCoalAirSensible;
 }
 // (success)2-3: 三次空气显热
-function cal_thirdAir_sensible_enteringNode(hourlyThirdAirVolume, hourlyClinkerProduction, thirdAirTemperature, carbonMonoxideVolumeFractionThird, carbonDioxideVolumeFractionThird, oxygenVolumeFractionThird, nitrogenVolumeFractionThird, carbonMonoxideSpecificHeatThird, carbonDioxideSpecificHeatThird, oxygenSpecificHeatThird, nitrogenSpecificHeatThird, clinkerSpecificHeat, ThirdAirDustContent){
-    let thirdAirSpecificHeat = (
-        (carbonMonoxideVolumeFractionThird * carbonMonoxideSpecificHeatThird) +
-        (carbonDioxideVolumeFractionThird * carbonDioxideSpecificHeatThird) +
-        (oxygenVolumeFractionThird * oxygenSpecificHeatThird) +
-        (nitrogenVolumeFractionThird * nitrogenSpecificHeatThird)) / 100;
-	let DustMassStream = hourlyThirdAirVolume * ThirdAirDustContent / hourlyClinkerProduction;
-    let thirdAirSensible = (hourlyThirdAirVolume * thirdAirSpecificHeat * thirdAirTemperature / hourlyClinkerProduction) + (DustMassStream * thirdAirTemperature * clinkerSpecificHeat);
+function cal_thirdAir_sensible_enteringNode(hourlyThirdAirVolume, hourlyClinkerProduction, thirdAirSpecificHeat, thirdAirTemperature){
+    let thirdAirSensible = (hourlyThirdAirVolume / hourlyClinkerProduction) * thirdAirSpecificHeat * thirdAirTemperature
     return thirdAirSensible;
 }
 // (success)2-4
-function cal_rawMaterial_sensible_enteringNode(hourlyRawMaterial, hourlyClinkerProduction, rawMaterialTemperature, rawMaterialWaterContent){
-    // rawMaterialTemperature : 生料的温度
-	let rawMaterialMassStream = cal_rawMaterial_massStream_enteringNode(hourlyRawMaterial, hourlyClinkerProduction)
-    let rawMaterialMassStreamSpecificHeat = (0.88 + 2.93e4 * rawMaterialTemperature) + 4.1816 * (rawMaterialWaterContent / (100 - rawMaterialWaterContent));
-	let rawMaterialSensible = rawMaterialMassStream * rawMaterialMassStreamSpecificHeat * rawMaterialTemperature
-    return rawMaterialSensible;
+function cal_rawMaterial_sensible_enteringNode(rawMaterialSensibleSP){
+    return rawMaterialSensibleSP;
 }
+
 // (success)2-5:漏风显热
-function cal_leakage_sensible_enteringNode(hourlyLeakageVolume, hourlyClinkerProduction, airTemperature){
-    let leakageSensible = hourlyLeakageVolume / hourlyClinkerProduction * standardAirSpecificHeat * airTemperature;
+function cal_leakage_sensible_enteringNode(hourlyLeakageVolume, hourlyClinkerProduction, standardAirSpecificHeat, envTemperature){
+    let leakageSensible = hourlyLeakageVolume / hourlyClinkerProduction * standardAirSpecificHeat * envTemperature;
     return leakageSensible;
 }
 // (success)2-6
 function cal_coalPowderBurning_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalHeatingValue){
     // coalHeatingValue: 人分解炉煤粉收到基低位发热量
-    let coalPowderMassStream = cal_coalPowder_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction)
+    let coalPowderMassStream = cal_coalPowder_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction);
     let coalPowderBurningSensible = coalPowderMassStream * coalHeatingValue;
     return coalPowderBurningSensible;
 }
 // （success）2-7 废气显热
-function cal_wasterGas_sensible_enteringNode(hourlyWasterGasVolume, hourlyClinkerProduction, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas){
+function cal_wasterGas_sensible_enteringNode(hourlyClinkerProduction, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas, hourlySecondAirVolume, hourlyFirstAirVolumeRK){
     let wasterGasSpecificHeat = (
         (carbonMonoxideVolumeFractionWasterGas * carbonMonoxideSpecificHeatWasterGas) +
         (carbonDioxideVolumeFractionWasterGas * carbonDioxideSpecificHeatWasterGas) +
         (oxygenVolumeFractionWasterGas * oxygenSpecificHeatWasterGas) +
         (nitrogenVolumeFractionWasterGas * nitrogenSpecificHeatWasterGas)) / 100;
 
-    let wasterGasSensible = hourlyWasterGasVolume * wasterGasSpecificHeat * wasterGasTemperature / hourlyClinkerProduction;
+    let wasterGasVolume = hourlySecondAirVolume + hourlyFirstAirVolumeRK
+    let wasterGasSensible = wasterGasVolume * wasterGasSpecificHeat * wasterGasTemperature / hourlyClinkerProduction;
     return wasterGasSensible;
 }
-// (success)2-8 飞灰显热
-function cal_ash_sensible_enteringNode(hourlyWasterGasVolume, hourlyClinkerProduction, ashDensity, ashContent, ashSpecificHeat, wasterGasTemperature){
-    let ashMassStream = cal_ash_massStream_enteringNode(hourlyWasterGasVolume, hourlyClinkerProduction, ashContent);
-    let ashSensible = ashMassStream * ashSpecificHeat * wasterGasTemperature;
-    return ashSensible;
-}
-// (success)2-9: 其他的
+// (success)2-8: 其他的
 function cal_others_sensible_enteringNode(hourlyOthersMass, hourlyClinkerProduction, othersSpecificHeat, othersTemperature){
 	let othersMassStream = cal_others_massStream_enteringNode(hourlyOthersMass, hourlyClinkerProduction)
 	let othersSensible = othersMassStream * othersSpecificHeat * othersTemperature
 	return othersSensible
 }
-// (success)2-10: 其他的燃烧热
+// (success)2-9: 其他的燃烧热
 function cal_othersBurning_sensible_enteringNode(hourlyOthersMass, hourlyClinkerProduction, othersHeatingValue){
 	let othersMassStream = cal_others_massStream_enteringNode(hourlyOthersMass, hourlyClinkerProduction)
 	let othersBurningSensible = othersMassStream * othersHeatingValue;
 	return othersBurningSensible
 }
-// 3.离开冷却炉的物质流
-function cal_total_massStream_leavingNode(hourlyLeavingCoalPowder, hourlyClinkerProduction, hourlyWasterGasVolume, carbonMonoxideDensityWasterGas, carbonDioxideDensityWasterGas, oxygenDensityWasterGas, nitrogenDensityWasterGas, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, ashContent){
-    let coalPowderMassStream = cal_coalPowder_massStream_leavingNode(hourlyLeavingCoalPowder, hourlyClinkerProduction)
-    let wasterGasMassStream = cal_wasterGas_massStream_leavingNode(hourlyWasterGasVolume, hourlyClinkerProduction, carbonMonoxideDensityWasterGas, carbonDioxideDensityWasterGas, oxygenDensityWasterGas, nitrogenDensityWasterGas, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas)
-    let ashMassStream = cal_ash_massStream_leavingNode(hourlyWasterGasVolume, hourlyClinkerProduction, ashContent)
 
-    let totalLeavingNodeMassStream = coalPowderMassStream + wasterGasMassStream + ashMassStream;
+// 3.离开冷却炉的物质流
+function cal_total_massStream_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, calciumOxideContent, magnesiumOxideContent, wasterGasMassStreamSP, ashMassStreamSP){
+    let outRawMaterialMassStream = cal_outRawMaterial_massStream_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, calciumOxideContent, magnesiumOxideContent)
+    let wasterGasMassStream = cal_wasterGas_massStream_leavingNode(wasterGasMassStreamSP)
+    let ashMassStream = cal_ash_massStream_leavingNode(ashMassStreamSP)
+
+    console.log("QTEST", outRawMaterialMassStream, wasterGasMassStream, ashMassStream);
+    
+    let totalLeavingNodeMassStream = outRawMaterialMassStream + wasterGasMassStream + ashMassStream;
     return totalLeavingNodeMassStream;
 }
 // (success)3-1:煤粉
-function cal_coalPowder_massStream_leavingNode(hourlyLeavingCoalPowder, hourlyClinkerProduction){
-    let coalPowderMassStream = hourlyLeavingCoalPowder / hourlyClinkerProduction;
-    return coalPowderMassStream;
+function cal_outRawMaterial_massStream_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, calciumOxideContent, magnesiumOxideContent){
+    let carbonDioxideContent = ((calciumOxideContent / 100) * (44 / 56)) + ((magnesiumOxideContent / 100) * (44 / 40.3));
+    let carbonDioxideMassStream = hourlyRawMaterial * carbonDioxideContent
+    let outRawMaterial = hourlyRawMaterial - carbonDioxideMassStream
+    let outRawMaterialMassStream = outRawMaterial / hourlyClinkerProduction;
+    return outRawMaterialMassStream;
 }
 // (success)3-2:废气
-function cal_wasterGas_massStream_leavingNode(hourlyWasterGasVolume, hourlyClinkerProduction, carbonMonoxideDensityWasterGas, carbonDioxideDensityWasterGas, oxygenDensityWasterGas, nitrogenDensityWasterGas, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas){
-    let wasterGasDensity = (
-        carbonMonoxideDensityWasterGas * carbonMonoxideVolumeFractionWasterGas +
-        carbonDioxideDensityWasterGas * carbonDioxideVolumeFractionWasterGas+
-        oxygenDensityWasterGas * oxygenVolumeFractionWasterGas +
-        nitrogenDensityWasterGas * nitrogenVolumeFractionWasterGas) / 100;
-
-    let wasterGasMassStream = hourlyWasterGasVolume * wasterGasDensity / hourlyClinkerProduction;
-    return wasterGasMassStream
+function cal_wasterGas_massStream_leavingNode(wasterGasMassStreamSP){
+    return wasterGasMassStreamSP;
 }
 // (success)3-3:飞灰
-function cal_ash_massStream_leavingNode(hourlyWasterGasVolume, hourlyClinkerProduction, ashContent){
-    let ashMassStream = hourlyWasterGasVolume * ashContent / hourlyClinkerProduction;
-    return ashMassStream;
+function cal_ash_massStream_leavingNode(ashMassStreamSP){
+    return ashMassStreamSP;
 }
 // 4.离开冷却炉的能量流
-function cal_total_energyStream_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, rawMaterialSpecificHeat, rawMaterialTemperature, hourlyWasterGasVolume, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas, ashDensity, ashContent, ashSpecificHeat, ashLoss, rawMaterialLoss, rawMaterialWaterContent, magnesiumOxideContent, calciumOxideContent, hourlyCoalPowder){
-    let rawMaterialSensible = cal_rawMaterial_sensible_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, rawMaterialSpecificHeat, rawMaterialTemperature)
-    let wasterGasSensible = cal_wasterGas_sensible_leavingNode(hourlyWasterGasVolume, hourlyClinkerProduction, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas)
-    let ashSensible = cal_ash_sensible_leavingNode(hourlyWasterGasVolume, hourlyClinkerProduction, ashDensity, ashContent, ashSpecificHeat, wasterGasTemperature)
-    let ashDehydrationAndDecompositionHeatSensible = cal_ashDehydrationAndDecompositionHeat_sensible_leavingNode(hourlyWasterGasVolume, hourlyClinkerProduction, ashDensity, ashContent, ashLoss, rawMaterialLoss, rawMaterialWaterContent, magnesiumOxideContent, calciumOxideContent)
-    let coalPowderBurningSensible = cal_coalPowderBurning_sensible_leavingNode(hourlyCoalPowder, hourlyClinkerProduction, carbonMonoxideVolumeFractionWasterGas)
+function cal_total_energyStream_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, rawMaterialMassStreamSP, wasterGasSensibleSP, ashSensibleSP, ashMassStreamSP, calciumOxideContent, magnesiumOxideContent, ashBurnLoss, rawMaterialBurnLoss, rawMaterialWaterContent){
+    let rawMaterialSensible = cal_rawMaterial_sensible_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, rawMaterialMassStreamSP)
+    let wasterGasSensible = cal_wasterGas_sensible_leavingNode(wasterGasSensibleSP)
+    let ashSensible = cal_ash_sensible_leavingNode(ashSensibleSP)
+    let ashDehydrationAndDecompositionHeatSensible = cal_ashDehydrationAndDecompositionHeat_sensible_leavingNode(ashMassStreamSP, calciumOxideContent, magnesiumOxideContent, ashBurnLoss, rawMaterialBurnLoss, rawMaterialWaterContent)
 
-    let totalLeavingSensible = rawMaterialSensible + wasterGasSensible + ashSensible + ashDehydrationAndDecompositionHeatSensible + coalPowderBurningSensible;
+    let totalLeavingSensible = rawMaterialSensible + wasterGasSensible + ashSensible + ashDehydrationAndDecompositionHeatSensible ;
     return totalLeavingSensible;
 }
 // (success)4-1: 生料显热
-function cal_rawMaterial_sensible_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, rawMaterialSpecificHeat, rawMaterialTemperature){
-    let rawMaterialMassStream = cal_rawMaterial_massStream_enteringNode(hourlyRawMaterial, hourlyClinkerProduction)
+function cal_rawMaterial_sensible_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, rawMaterialMassStreamSP){
+    let rawMaterialMassStream = cal_rawMaterial_massStream_enteringNode(rawMaterialMassStreamSP)
     let rawMaterialSensible = rawMaterialMassStream * rawMaterialSpecificHeat * rawMaterialTemperature;
     return rawMaterialSensible;
 }
 // 4-2: 废气显热
-function cal_wasterGas_sensible_leavingNode(hourlyWasterGasVolume, hourlyClinkerProduction, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas){
-    let wasterGasSpecificHeat = (
-        (carbonMonoxideVolumeFractionWasterGas * carbonMonoxideSpecificHeatWasterGas) +
-        (carbonDioxideVolumeFractionWasterGas * carbonDioxideSpecificHeatWasterGas) +
-        (oxygenVolumeFractionWasterGas * oxygenSpecificHeatWasterGas) +
-        (nitrogenVolumeFractionWasterGas * nitrogenSpecificHeatWasterGas)) / 100;
-
-    let wasterGasSensible = hourlyWasterGasVolume * wasterGasSpecificHeat * wasterGasTemperature / hourlyClinkerProduction;
-    return wasterGasSensible;
+function cal_wasterGas_sensible_leavingNode(wasterGasSensibleSP){
+    return wasterGasSensibleSP;
 }
 // 4-3 飞灰显热
-function cal_ash_sensible_leavingNode(hourlyWasterGasVolume, hourlyClinkerProduction, ashDensity, ashContent, ashSpecificHeat, wasterGasTemperature){
-    let ashMassStream = cal_ash_massStream_enteringNode(hourlyWasterGasVolume, hourlyClinkerProduction, ashContent);
-    let ashSensible = ashMassStream * ashSpecificHeat * wasterGasTemperature;
-    return ashSensible;
+function cal_ash_sensible_leavingNode(ashSensibleSP){
+    return ashSensibleSP;
 }
+
+// // 4-5 煤粉的燃烧
+// function cal_coalPowderBurning_sensible_leavingNode(hourlyCoalPowder, hourlyClinkerProduction, carbonMonoxideVolumeFractionWasterGas){
+//     let coalPowderBurningSensible = (hourlyCoalPowder / hourlyClinkerProduction) * (carbonMonoxideVolumeFractionWasterGas / 100) * 12630;
+//     return coalPowderBurningSensible;
+// }
+
+
 // 4-4 飞灰脱水和碳酸盐分解热
-function cal_ashDehydrationAndDecompositionHeat_sensible_leavingNode(hourlyWasterGasVolume, hourlyClinkerProduction, ashDensity, ashContent, ashLoss, rawMaterialLoss, rawMaterialWaterContent, magnesiumOxideContent, calciumOxideContent){
-    let ashDehydrationAndDecompositionHeatSensible;
 
+function cal_ashDehydrationAndDecompositionHeat_sensible_leavingNode(ashMassStreamSP, calciumOxideContent, magnesiumOxideContent, ashBurnLoss, rawMaterialBurnLoss, rawMaterialWaterContent){
     let carbonDioxideContent = ((calciumOxideContent / 100) * (44 / 56)) + ((magnesiumOxideContent / 100) * (44 / 40.3));
-    let ashMassStream = cal_ash_massStream_enteringNode(hourlyWasterGasVolume, hourlyClinkerProduction, ashContent)
-    ashDehydrationAndDecompositionHeatSensible = ashMassStream * ((100-ashLoss) / (100-rawMaterialLoss)) * (rawMaterialWaterContent / 100) * 6690 + (ashMassStream * ((100-ashLoss) / (100-rawMaterialLoss)) - ashMassStream * carbonDioxideContent / 100) * (100 / 44) * 1660;
-
+    let ashMassStream = cal_ash_massStream_leavingNode(ashMassStreamSP)
+    let ashDehydrationAndDecompositionHeatSensible = ashMassStream * ((100 - ashBurnLoss)/(100 - rawMaterialBurnLoss)) * (rawMaterialWaterContent / 100) * 6690 + ((ashMassStream * ((100 - ashBurnLoss)/(100 - rawMaterialBurnLoss)) * (carbonDioxideContent / 100) - ashMassStream * (ashBurnLoss / 100)) * (100/44) * 1660);
     return ashDehydrationAndDecompositionHeatSensible;
-}
-// 4-5 煤粉的燃烧
-function cal_coalPowderBurning_sensible_leavingNode(hourlyCoalPowder, hourlyClinkerProduction, carbonMonoxideVolumeFractionWasterGas){
-    let coalPowderBurningSensible = (hourlyCoalPowder / hourlyClinkerProduction) * (carbonMonoxideVolumeFractionWasterGas / 100) * 12630;
-    return coalPowderBurningSensible;
 }
