@@ -275,12 +275,12 @@ export default {
     // 分页切换
     changeModel(title, index){
       this.title = title
-      console.log(index)
       this.inputList = JSON.parse(JSON.stringify(cement_data)).data[index].inputList
       this.paramList = JSON.parse(JSON.stringify(cement_data)).data[index].paramList
       this.markDownText = JSON.parse(JSON.stringify(cement_data)).data[index].markDownText
       this.latexList = JSON.parse(JSON.stringify(cement_data)).data[index].latexList
       this.flow = JSON.parse(JSON.stringify(cement_data)).data[index].name
+      console.log(index, title, this.flow)
     },
     // 处理上传文件
     async handleUpload(){
@@ -330,9 +330,9 @@ export default {
               
             //   this.dateList.push(item.slice(0,1))
             // })
-            this.dateList.map((item, index) => {
-              console.log(`索引 ${index}，值: ${item}`);
-            });
+            //this.dateList.map((item, index) => {
+            //  console.log(`索引 ${index}，值: ${item}`);
+            //});
             
             // const dataList = jsonData.map((row) => row);
             // console.log("datalist", dataList[0]);
@@ -470,15 +470,16 @@ export default {
 	},
     starCalculate(){
       // console.log(this.formRules)
-      console.log("dataList cal");
+      console.log("TEST", this.date);
+      
       
       const argList_PH = this.dataList[this.date].slice(1, 36)
       const result_PH = fun1(...argList_PH)
-      console.log(result_PH, "ARG_PH");
+      // console.log(result_PH, "ARG_PH");
       
       const argList_SP = [...this.dataList[this.date].slice(36, 49), ...result_PH[1]]
       const result_SP = fun2(...argList_SP)
-      console.log(result_SP, "result ARG_SP");
+      // console.log(result_SP, "result ARG_SP");
       
       const argList_SF = [...this.dataList[this.date].slice(49, 96), ...result_SP[1]]
       const result_SF = fun3(...argList_SF)
@@ -491,46 +492,49 @@ export default {
       
       const argList_AQC = [...this.dataList[this.date].slice(140, 151), ...result_C[1]]
       const result_AQC = fun6(...argList_AQC) 
-      console.log(argList_AQC);
-      console.log(result_AQC);
+      // console.log(argList_AQC);
+      // console.log(result_AQC);
       
+      console.log("dataList cal");
 
       switch(this.flow){    
         case "PH_Boiler":
           this.createChart(this.$refs.pieChart1, result_PH[2][0])
           this.createChart(this.$refs.pieChart2, result_PH[2][1])
-          this.createChart(this.$refs.pieChart3, (1 - result_PH[2][1]))
+          this.createChart(this.$refs.pieChart3, (100 - result_PH[2][1]))
           break
         case "SuspensionPreheater":
         
           this.createChart(this.$refs.pieChart1, result_SP[2][0])
           this.createChart(this.$refs.pieChart2, result_SP[2][1])
-          this.createChart(this.$refs.pieChart3, (1 - result_SP[2][1]))
+          this.createChart(this.$refs.pieChart3, (100 - result_SP[2][1]))
           break
         case "StratifiedFurnace":
           this.createChart(this.$refs.pieChart1, result_SF[0][0])
           this.createChart(this.$refs.pieChart2, result_SF[0][1])
-          this.createChart(this.$refs.pieChart3, (1 - result_SF[0][1]))
+          this.createChart(this.$refs.pieChart3, (100 - result_SF[0][1]))
           break
         case "RotaryKiln":
           this.createChart(this.$refs.pieChart1, result_RK[0][0])
           this.createChart(this.$refs.pieChart2, result_RK[0][1])
-          this.createChart(this.$refs.pieChart3, (1 - result_RK[0][1]))
+          this.createChart(this.$refs.pieChart3, (100 - result_RK[0][1]))
           break
         case "Cooler":
           this.createChart(this.$refs.pieChart1, result_C[0][0])
           this.createChart(this.$refs.pieChart2, result_C[0][1])
-          this.createChart(this.$refs.pieChart3, (1 - result_C[0][1]))
+          this.createChart(this.$refs.pieChart3, (100 - result_C[0][1]))
           break
         case "AQCBoilder":
-          this.createChart(this.$refs.pieChart1, result_AQC[0][0])
-          this.createChart(this.$refs.pieChart2, result_AQC[0][1])
-          this.createChart(this.$refs.pieChart3, (1 - result_AQC[0][1]))
+          this.createChart(this.$refs.pieChart1, result_AQC[0])
+          this.createChart(this.$refs.pieChart2, result_AQC[1])
+          this.createChart(this.$refs.pieChart3, (100 - result_AQC[1]))
+          console.log(argList_AQC, result_AQC);
+          
           break
         default:
           this.createChart(this.$refs.pieChart1, result_PH[2][0])
           this.createChart(this.$refs.pieChart2, result_PH[2][1])
-          this.createChart(this.$refs.pieChart3, (1 - result_PH[2][1]))
+          this.createChart(this.$refs.pieChart3, (100 - result_PH[2][1]))
           break
 			}
 

@@ -114,7 +114,7 @@ export function fun3(
     let totalEnteringMassStream = cal_total_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, hourlySendCoalAirVolume, hourlyThirdAirVolume, thirdAirDensity, hourlyLeakageVolume, standardAirDensity, hourlySecondAirVolume, hourlyFirstAirVolumeRK, carbonMonoxideDensityWasterGasRK, carbonDioxideDensityWasterGasRK, oxygenDensityWasterGasRK, nitrogenDensityWasterGasRK, carbonMonoxideVolumeFractionWasterGasRK, carbonDioxideVolumeFractionWasterGasRK, oxygenVolumeFractionWasterGasRK, nitrogenVolumeFractionWasterGasRK, hourlyOthersMass, rawMaterialMassStreamSP);
     let totalEnteringSensible = cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderTemperature, coalPowderSpecificHeat, hourlySendCoalAirVolume,standardAirSpecificHeat, sendCoalAirTemperature, hourlyThirdAirVolume, thirdAirSpecificHeat, thirdAirTemperature, rawMaterialSensibleSP, hourlyLeakageVolume, envTemperature, coalHeatingValue, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas, hourlyOthersMass, othersSpecificHeat, othersTemperature, othersHeatingValue, hourlySecondAirVolume, hourlyFirstAirVolumeRK)
     let totalLeavingMassStream = cal_total_massStream_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, calciumOxideContent, magnesiumOxideContent, wasterGasMassStreamSP, ashMassStreamSP)
-    let totalLeavingSensible = cal_total_energyStream_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, rawMaterialMassStreamSP, wasterGasSensibleSP, ashSensibleSP, ashMassStreamSP, calciumOxideContent, magnesiumOxideContent, ashBurnLoss, rawMaterialBurnLoss, rawMaterialWaterContent)
+    let totalLeavingSensible = cal_total_energyStream_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, wasterGasSensibleSP, ashSensibleSP, ashMassStreamSP, calciumOxideContent, magnesiumOxideContent, ashBurnLoss, rawMaterialBurnLoss, rawMaterialWaterContent, hourlyRawMaterial, hourlyClinkerProduction)
 
     // 可计算物质流损失比和热效率
     let massStreamRatio = totalLeavingMassStream / totalEnteringMassStream * 100;
@@ -122,10 +122,10 @@ export function fun3(
 
     // temp
 
-    let leakageMassStreamSF = cal_leakage_massStream_enteringNode(hourlyLeakageVolume, hourlyClinkerProduction, standardAirDensity)
-    let rawMaterialSensibleSF = cal_rawMaterial_sensible_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, rawMaterialMassStreamSP)
+    let outRawMaterialMassStreamSF = cal_outRawMaterial_massStream_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, calciumOxideContent, magnesiumOxideContent)
+    let rawMaterialSensibleSF = cal_rawMaterial_sensible_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, hourlyRawMaterial, hourlyClinkerProduction, calciumOxideContent, magnesiumOxideContent)
     let wasterGasMassStreamSF = cal_wasterGas_massStream_leavingNode(wasterGasMassStreamSP)
-    let wasterGasSensibleSF = cal_wasterGas_sensible_leavingNode(wasterGasSensibleSP)
+    let wasterGasSensibleSF = cal_wasterGas_sensible_enteringNode(hourlyClinkerProduction, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas, hourlySecondAirVolume, hourlyFirstAirVolumeRK)
     let coalPowderBurningSensible = cal_coalPowderBurning_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalHeatingValue)
     let thirdAirMassStreamSF = cal_thirdAir_massStream_enteringNode(hourlyThirdAirVolume, hourlyClinkerProduction, thirdAirDensity)
 
@@ -133,7 +133,7 @@ export function fun3(
     
     return [
         [massStreamRatio, thermalEfficiency], 
-        [leakageMassStreamSF, rawMaterialSensibleSF, wasterGasMassStreamSF, wasterGasSensibleSF, coalPowderBurningSensible, ashSensibleSP, thirdAirMassStreamSF], 
+        [outRawMaterialMassStreamSF, rawMaterialSensibleSF, wasterGasMassStreamSF, wasterGasSensibleSF, coalPowderBurningSensible, ashSensibleSP, thirdAirMassStreamSF], 
         [totalEnteringMassStream, totalEnteringSensible, totalLeavingMassStream, totalLeavingSensible]
     ];
 }
@@ -147,20 +147,21 @@ function cal_total_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduc
     let wasterGasMassStream = cal_wasterGas_massStream_enteringNode(hourlySecondAirVolume, hourlyFirstAirVolumeRK, hourlyClinkerProduction, carbonMonoxideDensityWasterGasRK, carbonDioxideDensityWasterGasRK, oxygenDensityWasterGasRK, nitrogenDensityWasterGasRK, carbonMonoxideVolumeFractionWasterGasRK, carbonDioxideVolumeFractionWasterGasRK, oxygenVolumeFractionWasterGasRK, nitrogenVolumeFractionWasterGasRK)
 	let othersMassStream = cal_others_massStream_enteringNode(hourlyOthersMass, hourlyClinkerProduction)
 
-    console.log("SF", coalPowderMassStream, sendCoalAirMassStream, thirdAirMassStream, rawMaterialMassStream, leakageMassStream, wasterGasMassStream, othersMassStream);
-    
     let totalEnteringNodeMassStream = coalPowderMassStream + sendCoalAirMassStream + thirdAirMassStream + rawMaterialMassStream + leakageMassStream + wasterGasMassStream + othersMassStream;
     // let totalEnteringNodeMassStream = coalPowderMassStream + sendCoalAirMassStream + thirdAirMassStream + rawMaterialMassStream + leakageMassStream + wasterGasMassStream;
+
     return totalEnteringNodeMassStream;
 }
 // [PASS] 2-48 (success)1-1:煤粉进入的物质流
 function cal_coalPowder_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction){
     let coalPowderMassStream = hourlyCoalPowder / hourlyClinkerProduction;
+
     return coalPowderMassStream;
 }
 // [PASS] 2-49 (success)1-2:一次空气的物质流 -> 送煤空气
 function cal_sendCoalAir_massStream_enteringNode(hourlySendCoalAirVolume, hourlyClinkerProduction, standardAirDensity){
     let sendCoalAirMassStream = hourlySendCoalAirVolume * standardAirDensity / hourlyClinkerProduction;
+
     return sendCoalAirMassStream;
 }
 // [PASS] 2-51 (success)1-3:三次空气的物质流
@@ -168,16 +169,20 @@ function cal_thirdAir_massStream_enteringNode(hourlyThirdAirVolume, hourlyClinke
 	// let DustMassStream = hourlyThirdAirVolume * ThirdAirDustContent / hourlyClinkerProduction
 	let DUSTMASSSTREAM = 0
     let thirdAirMassStream = (hourlyThirdAirVolume * thirdAirDensity / hourlyClinkerProduction) + DUSTMASSSTREAM;
+
+
     return thirdAirMassStream;
 }
 // [CHANGE] (success)1-4:出口生料的物质流
 function cal_rawMaterial_massStream_enteringNode(rawMaterialMassStreamSP){
+
     return rawMaterialMassStreamSP;
 }
 // [PASS] 2-53(success)1-5:漏风的物质流
 function cal_leakage_massStream_enteringNode(hourlyLeakageVolume, hourlyClinkerProduction, standardAirDensity){
     // 使用标准空气的密度
     let leakageMassStream = hourlyLeakageVolume * standardAirDensity / hourlyClinkerProduction;
+
     return leakageMassStream;
 }
 // (success)1-6:窑尾的废气的物质流
@@ -191,12 +196,15 @@ function cal_wasterGas_massStream_enteringNode(hourlySecondAirVolume, hourlyFirs
     let wasterGasVolume = hourlySecondAirVolume + hourlyFirstAirVolumeRK
 
     let wasterGasMassStream = wasterGasVolume * wasterGasDensity / hourlyClinkerProduction;
+
     return wasterGasMassStream
 }
 
 // (success)1-8:其他燃料
 function cal_others_massStream_enteringNode(hourlyOthersMass, hourlyClinkerProduction){
 	let othersMassStream = hourlyOthersMass / hourlyClinkerProduction;
+
+
 	return othersMassStream;
 }
 // 2.进入冷却炉的能量流
@@ -213,32 +221,42 @@ function cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProducti
     let othersBurningSensible = cal_othersBurning_sensible_enteringNode(hourlyOthersMass, hourlyClinkerProduction, othersHeatingValue)
 
     let totalEnteringNodeSensible = coalPowderSensible + sendCoalAirSensible + thirdAirSensible + rawMaterialSensible + leakageSensible + coalPowderBurningSensible + wasterGasSensible + othersSensible + othersBurningSensible
+ 
     return totalEnteringNodeSensible;
 }
 // (success)2-1
 function cal_coalPowder_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderTemperature, coalPowderSpecificHeat){
     let coalPowderMassStream = cal_coalPowder_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction);
     let coalPowderSensible = coalPowderMassStream * coalPowderSpecificHeat * coalPowderTemperature;
+
+
     return coalPowderSensible;
 }
 // (success)2-2：送煤空气
 function cal_sendCoalAir_sensible_enteringNode(hourlySendCoalAirVolume, hourlyClinkerProduction, standardAirSpecificHeat, sendCoalAirTemperature){
     let sendCoalAirSensible = hourlySendCoalAirVolume * standardAirSpecificHeat * sendCoalAirTemperature / hourlyClinkerProduction;
+
+    
     return sendCoalAirSensible;
 }
 // (success)2-3: 三次空气显热
 function cal_thirdAir_sensible_enteringNode(hourlyThirdAirVolume, hourlyClinkerProduction, thirdAirSpecificHeat, thirdAirTemperature){
     let thirdAirSensible = (hourlyThirdAirVolume / hourlyClinkerProduction) * thirdAirSpecificHeat * thirdAirTemperature
+
     return thirdAirSensible;
 }
 // (success)2-4
 function cal_rawMaterial_sensible_enteringNode(rawMaterialSensibleSP){
+
+
     return rawMaterialSensibleSP;
 }
 
 // (success)2-5:漏风显热
 function cal_leakage_sensible_enteringNode(hourlyLeakageVolume, hourlyClinkerProduction, standardAirSpecificHeat, envTemperature){
     let leakageSensible = hourlyLeakageVolume / hourlyClinkerProduction * standardAirSpecificHeat * envTemperature;
+
+
     return leakageSensible;
 }
 // (success)2-6
@@ -246,6 +264,7 @@ function cal_coalPowderBurning_sensible_enteringNode(hourlyCoalPowder, hourlyCli
     // coalHeatingValue: 人分解炉煤粉收到基低位发热量
     let coalPowderMassStream = cal_coalPowder_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction);
     let coalPowderBurningSensible = coalPowderMassStream * coalHeatingValue;
+
     return coalPowderBurningSensible;
 }
 // （success）2-7 废气显热
@@ -258,18 +277,24 @@ function cal_wasterGas_sensible_enteringNode(hourlyClinkerProduction, wasterGasT
 
     let wasterGasVolume = hourlySecondAirVolume + hourlyFirstAirVolumeRK
     let wasterGasSensible = wasterGasVolume * wasterGasSpecificHeat * wasterGasTemperature / hourlyClinkerProduction;
+
+
     return wasterGasSensible;
 }
 // (success)2-8: 其他的
 function cal_others_sensible_enteringNode(hourlyOthersMass, hourlyClinkerProduction, othersSpecificHeat, othersTemperature){
 	let othersMassStream = cal_others_massStream_enteringNode(hourlyOthersMass, hourlyClinkerProduction)
 	let othersSensible = othersMassStream * othersSpecificHeat * othersTemperature
+
+
 	return othersSensible
 }
 // (success)2-9: 其他的燃烧热
 function cal_othersBurning_sensible_enteringNode(hourlyOthersMass, hourlyClinkerProduction, othersHeatingValue){
 	let othersMassStream = cal_others_massStream_enteringNode(hourlyOthersMass, hourlyClinkerProduction)
 	let othersBurningSensible = othersMassStream * othersHeatingValue;
+
+
 	return othersBurningSensible
 }
 
@@ -279,9 +304,9 @@ function cal_total_massStream_leavingNode(hourlyRawMaterial, hourlyClinkerProduc
     let wasterGasMassStream = cal_wasterGas_massStream_leavingNode(wasterGasMassStreamSP)
     let ashMassStream = cal_ash_massStream_leavingNode(ashMassStreamSP)
 
-    console.log("QTEST", outRawMaterialMassStream, wasterGasMassStream, ashMassStream);
     
     let totalLeavingNodeMassStream = outRawMaterialMassStream + wasterGasMassStream + ashMassStream;
+
     return totalLeavingNodeMassStream;
 }
 // (success)3-1:煤粉
@@ -290,38 +315,46 @@ function cal_outRawMaterial_massStream_leavingNode(hourlyRawMaterial, hourlyClin
     let carbonDioxideMassStream = hourlyRawMaterial * carbonDioxideContent
     let outRawMaterial = hourlyRawMaterial - carbonDioxideMassStream
     let outRawMaterialMassStream = outRawMaterial / hourlyClinkerProduction;
+
+
     return outRawMaterialMassStream;
 }
 // (success)3-2:废气
 function cal_wasterGas_massStream_leavingNode(wasterGasMassStreamSP){
+
     return wasterGasMassStreamSP;
 }
 // (success)3-3:飞灰
 function cal_ash_massStream_leavingNode(ashMassStreamSP){
+
     return ashMassStreamSP;
 }
 // 4.离开冷却炉的能量流
-function cal_total_energyStream_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, rawMaterialMassStreamSP, wasterGasSensibleSP, ashSensibleSP, ashMassStreamSP, calciumOxideContent, magnesiumOxideContent, ashBurnLoss, rawMaterialBurnLoss, rawMaterialWaterContent){
-    let rawMaterialSensible = cal_rawMaterial_sensible_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, rawMaterialMassStreamSP)
+function cal_total_energyStream_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, wasterGasSensibleSP, ashSensibleSP, ashMassStreamSP, calciumOxideContent, magnesiumOxideContent, ashBurnLoss, rawMaterialBurnLoss, rawMaterialWaterContent, hourlyRawMaterial, hourlyClinkerProduction){
+    let rawMaterialSensible = cal_rawMaterial_sensible_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, hourlyRawMaterial, hourlyClinkerProduction, calciumOxideContent, magnesiumOxideContent)
     let wasterGasSensible = cal_wasterGas_sensible_leavingNode(wasterGasSensibleSP)
     let ashSensible = cal_ash_sensible_leavingNode(ashSensibleSP)
     let ashDehydrationAndDecompositionHeatSensible = cal_ashDehydrationAndDecompositionHeat_sensible_leavingNode(ashMassStreamSP, calciumOxideContent, magnesiumOxideContent, ashBurnLoss, rawMaterialBurnLoss, rawMaterialWaterContent)
 
     let totalLeavingSensible = rawMaterialSensible + wasterGasSensible + ashSensible + ashDehydrationAndDecompositionHeatSensible ;
+
     return totalLeavingSensible;
 }
 // (success)4-1: 生料显热
-function cal_rawMaterial_sensible_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, rawMaterialMassStreamSP){
-    let rawMaterialMassStream = cal_rawMaterial_massStream_enteringNode(rawMaterialMassStreamSP)
-    let rawMaterialSensible = rawMaterialMassStream * rawMaterialSpecificHeat * rawMaterialTemperature;
+function cal_rawMaterial_sensible_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, hourlyRawMaterial, hourlyClinkerProduction, calciumOxideContent, magnesiumOxideContent){
+    let outRawMaterialMassStream = cal_outRawMaterial_massStream_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, calciumOxideContent, magnesiumOxideContent)
+    let rawMaterialSensible = outRawMaterialMassStream * rawMaterialSpecificHeat * rawMaterialTemperature;
+
     return rawMaterialSensible;
 }
 // 4-2: 废气显热
 function cal_wasterGas_sensible_leavingNode(wasterGasSensibleSP){
+
     return wasterGasSensibleSP;
 }
 // 4-3 飞灰显热
 function cal_ash_sensible_leavingNode(ashSensibleSP){
+
     return ashSensibleSP;
 }
 
@@ -337,6 +370,12 @@ function cal_ash_sensible_leavingNode(ashSensibleSP){
 function cal_ashDehydrationAndDecompositionHeat_sensible_leavingNode(ashMassStreamSP, calciumOxideContent, magnesiumOxideContent, ashBurnLoss, rawMaterialBurnLoss, rawMaterialWaterContent){
     let carbonDioxideContent = ((calciumOxideContent / 100) * (44 / 56)) + ((magnesiumOxideContent / 100) * (44 / 40.3));
     let ashMassStream = cal_ash_massStream_leavingNode(ashMassStreamSP)
-    let ashDehydrationAndDecompositionHeatSensible = ashMassStream * ((100 - ashBurnLoss)/(100 - rawMaterialBurnLoss)) * (rawMaterialWaterContent / 100) * 6690 + ((ashMassStream * ((100 - ashBurnLoss)/(100 - rawMaterialBurnLoss)) * (carbonDioxideContent / 100) - ashMassStream * (ashBurnLoss / 100)) * (100/44) * 1660);
+    let ashDehydrationAndDecompositionHeatSensible = (ashMassStream * ((100 - ashBurnLoss)/(100 - rawMaterialBurnLoss)) * (rawMaterialWaterContent / 100) * 6690) 
+        + ((ashMassStream * ((100 - ashBurnLoss)/(100 - rawMaterialBurnLoss)) * (carbonDioxideContent / 100) - ashMassStream * (ashBurnLoss / 100)) * (100/44) * 1660);
+   
+    // console.log("LOG", ashBurnLoss, rawMaterialBurnLoss, rawMaterialWaterContent);
+    
+    // console.log("LOG", ashDehydrationAndDecompositionHeatSensible, carbonDioxideContent, ashMassStream);
+    
     return ashDehydrationAndDecompositionHeatSensible;
 }

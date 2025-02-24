@@ -72,7 +72,7 @@ export function fun1(
     // 下一个需要使用的：
     let ashMassStreamPH = cal_Ash_massStream_enteringNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction);
     let wasterGasMassStreamPH = cal_wasteGas_massStream_enteringNode(PH_hourlyWasterGasVolume, hourlyClinkerProduction, carbonDioxideVolumeFraction, carbonMonoxideVolumeFraction, oxygenVolumeFraction, nitrogenVolumeFraction, carbonMonoxideDensity, carbonDioxideDensity, oxygenDensity, nitrogenDensity);
-    let wasterGasSensiblePH = cal_wasterGas_sensible_leavingNode(PH_hourlyWasterGasVolume, hourlyClinkerProduction, wasterGasTemperaturePH, carbonDioxideVolumeFractionPH, carbonMonoxideVolumeFractionPH, oxygenVolumeFractionPH, nitrogenVolumeFractionPH, carbonDioxideSpecificHeatPH, carbonMonoxideSpecificHeatPH, oxygenSpecificHeatPH, nitrogenSpecificHeatPH)
+    let wasterGasSensiblePH = cal_wasterGas_sensible_enteringNode(PH_hourlyWasterGasVolume, hourlyClinkerProduction, wasterGasTemperature, carbonDioxideVolumeFraction,carbonMonoxideVolumeFraction,oxygenVolumeFraction,nitrogenVolumeFraction,carbonDioxideSpecificHeat,carbonMonoxideSpecificHeat,oxygenSpecificHeat,nitrogenSpecificHeat)
     let ashSensiblePH = cal_Ash_sensible_enteringNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction, ashSpecificHeat, wasterGasTemperature);
     console.log("RESULT", [totalEnteringMassStream, totalEnteringSensible, totalLeavingMassStream, totalLeavingSensible], [ashMassStreamPH, wasterGasMassStreamPH, wasterGasSensiblePH, ashSensiblePH], [massStreamRatio, thermalEfficiency]);
     
@@ -88,6 +88,7 @@ function cal_total_massStream_enteringNode(PH_hourlyWasterGasVolume, hourlyClink
     let liquidWaterMassStream = cal_liquidWater_massStream_enteringNode(hourlyLiquidWaterMassStreamPH, hourlyClinkerProduction)
 
     let totalEnteringMassStream = wasterGasMassStream + ashMassStream + liquidWaterMassStream;
+    
     return totalEnteringMassStream;
 }
 // [PASS] 2-11 (success)1-1.预热器废气物质流公式
@@ -96,24 +97,28 @@ function cal_wasteGas_massStream_enteringNode(PH_hourlyWasterGasVolume, hourlyCl
     let wasterGasMassStream;
 
     wasterGasStandardDensity = (
-        (carbonDioxideVolumeFraction * carbonMonoxideDensity) +
-        (carbonMonoxideVolumeFraction * carbonDioxideDensity) +
+        (carbonDioxideVolumeFraction * carbonDioxideDensity) +
+        (carbonMonoxideVolumeFraction * carbonMonoxideDensity) +
         (oxygenVolumeFraction * oxygenDensity) +
         (nitrogenVolumeFraction * nitrogenDensity)
     ) / 100;
 
     wasterGasMassStream = (PH_hourlyWasterGasVolume / hourlyClinkerProduction) * wasterGasStandardDensity;
+    // console.log("1", wasterGasStandardDensity);
+    // console.log("1-1-1", wasterGasMassStream);
 
     return wasterGasMassStream;
 }
 // [PASS] 2-13 (success)1-2.预热器飞灰物质流公式
 function cal_Ash_massStream_enteringNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction){
     let ashMassStream = (ashConcentration * PH_hourlyWasterGasVolume) / hourlyClinkerProduction;
+    
     return ashMassStream;
 }
 // [PASS] 2-14 (success)1-3.液态水物质流公式
 function cal_liquidWater_massStream_enteringNode(hourlyLiquidWaterMassStreamPH, hourlyClinkerProduction){
     let liquidWaterMassStream = hourlyLiquidWaterMassStreamPH / hourlyClinkerProduction;
+
     return liquidWaterMassStream;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,6 +129,7 @@ function cal_total_energyStream_enteringNode(PH_hourlyWasterGasVolume, hourlyCli
     let liquidWaterSensible = cal_liquidWater_sensible_enteringNode(hourlyClinkerProduction, liquidWaterTemperature, liquidWaterSpecificHeat, hourlyLiquidWaterMassStreamPH)
 
     let totalEnteringSensible = wasterGasSensible + ashSensible + liquidWaterSensible;
+
     return totalEnteringSensible;
 }
 // [PASS] (success)2-1.废气的显热
@@ -149,18 +155,22 @@ function cal_wasterGas_sensible_enteringNode(
         (nitrogenSpecificHeat * nitrogenVolumeFraction)
     ) / 100;
     wasterGasSensible = (PH_hourlyWasterGasVolume * wasterGasSpecificHeat * wasterGasTemperature) / hourlyClinkerProduction;
+
     return wasterGasSensible;
 }
 // [PASS] 2-18 (success)2-2.飞灰的显热
 function cal_Ash_sensible_enteringNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction, ashSpecificHeat, wasterGasTemperature){
     let ashMassStream = cal_Ash_massStream_enteringNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction);
     let ashSensible = ashMassStream * ashSpecificHeat * wasterGasTemperature;
+
     return ashSensible;
 }
 // [PASS] 2-19 (success)2-3.液态水的显热
 function cal_liquidWater_sensible_enteringNode(hourlyClinkerProduction, liquidWaterTemperature, liquidWaterSpecificHeat, hourlyLiquidWaterMassStreamPH){
     let liquidWaterMassStream = cal_liquidWater_massStream_enteringNode(hourlyLiquidWaterMassStreamPH, hourlyClinkerProduction)
     let liquidWaterSensible = liquidWaterMassStream * liquidWaterSpecificHeat * liquidWaterTemperature;
+    // console.log("LOG", liquidWaterMassStream, liquidWaterSpecificHeat, liquidWaterTemperature);
+
     return liquidWaterSensible;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,11 +182,14 @@ function cal_total_massStream_leavingNode(PH_hourlyWasterGasVolume, hourlyClinke
 	let ashFallMassStream = cal_ashFall_massStream_leavingNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction, ashFallVelocity)
 	
     let totalLeavingMassStream = wasterGasMassStream + ashMassStream + waterVaporMassStream + ashFallMassStream;
+    // console.log("LOG", totalLeavingMassStream, wasterGasMassStream, ashMassStream, waterVaporMassStream, ashFallMassStream);
+
     return totalLeavingMassStream;
 }
 // [PASS] 2-21 (success)3-1.离开锅炉的废气物质流
 function cal_wasterGas_massStream_leavingNode(PH_hourlyWasterGasVolume, hourlyClinkerProduction, carbonDioxideVolumeFraction, carbonMonoxideVolumeFraction, oxygenVolumeFraction, nitrogenVolumeFraction, carbonMonoxideDensity, carbonDioxideDensity, oxygenDensity, nitrogenDensity){
     let wasterGasMassStream = cal_wasteGas_massStream_enteringNode(PH_hourlyWasterGasVolume, hourlyClinkerProduction, carbonDioxideVolumeFraction, carbonMonoxideVolumeFraction, oxygenVolumeFraction, nitrogenVolumeFraction, carbonMonoxideDensity, carbonDioxideDensity, oxygenDensity, nitrogenDensity);
+    
     return wasterGasMassStream;
 }
 // [CHANGE] 2-22 (success)3-2.离开锅炉的飞灰物质流
@@ -184,28 +197,37 @@ function cal_Ash_massStream_leavingNode(ashConcentration, PH_hourlyWasterGasVolu
     // ashFallVelocity: 飞灰的沉降率
     let ashMassStream = cal_Ash_massStream_enteringNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction);
 	let PHAshMassStream = ashMassStream * (1 - ashFallVelocity)
+
+
     return PHAshMassStream;
 }
 // [PASS] 2-23 (success)3-3.离开锅炉的水蒸气物质流
 function cal_waterVapor_massStream_leavingNode(hourlyWaterVaporMassStream, hourlyClinkerProduction){
     let waterVaporMassStream = hourlyWaterVaporMassStream / hourlyClinkerProduction;
+
+    // console.log("LOG", waterVaporMassStream);
+    
     return waterVaporMassStream;
 }
 // [CHANGE] 2-24(success)3-4: 沉降的飞灰
 function cal_ashFall_massStream_leavingNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction, ashFallVelocity){
 	let ashMassStream = cal_Ash_massStream_enteringNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction)
 	let ashFallMassStream = ashMassStream * ashFallVelocity
+
+
 	return ashFallMassStream
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 4.离开节点的能量总和
 function cal_total_energyStream_leavingNode(PH_hourlyWasterGasVolume, hourlyClinkerProduction, wasterGasTemperaturePH, ashConcentration, ashSpecificHeat, waterVaporTemperature, ashFallTemperature, carbonDioxideVolumeFractionPH, carbonMonoxideVolumeFractionPH, oxygenVolumeFractionPH, nitrogenVolumeFractionPH, carbonDioxideSpecificHeatPH, carbonMonoxideSpecificHeatPH, oxygenSpecificHeatPH, nitrogenSpecificHeatPH, ashFallVelocity, waterVaporSpecificHeat, hourlyWaterVaporMassStream){
     let wasterGasSensible = cal_wasterGas_sensible_leavingNode(PH_hourlyWasterGasVolume, hourlyClinkerProduction, wasterGasTemperaturePH, carbonDioxideVolumeFractionPH, carbonMonoxideVolumeFractionPH, oxygenVolumeFractionPH, nitrogenVolumeFractionPH, carbonDioxideSpecificHeatPH, carbonMonoxideSpecificHeatPH, oxygenSpecificHeatPH, nitrogenSpecificHeatPH)
-    let ashSensible = cal_Ash_sensible_leavingNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction, ashSpecificHeat, wasterGasTemperaturePH);
+    let ashSensible = cal_Ash_sensible_leavingNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction, ashSpecificHeat, ashFallVelocity, wasterGasTemperaturePH);
     let waterVaporSensible = cal_waterVapor_sensible_leavingNode(hourlyWaterVaporMassStream, hourlyClinkerProduction, waterVaporTemperature, waterVaporSpecificHeat);
 	let ashFallSensible = cal_ashFall_sensible_leavingNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction, ashFallVelocity, ashSpecificHeat, ashFallTemperature)
 
     let totalLeavingSensible = wasterGasSensible + ashSensible + waterVaporSensible + ashFallSensible;
+    // console.log("LOG", totalLeavingSensible);
+
     return totalLeavingSensible;
 }
 // [PASS] 2-25 (success)4-1.离开的废气显热
@@ -218,18 +240,25 @@ function cal_wasterGas_sensible_leavingNode(PH_hourlyWasterGasVolume, hourlyClin
 		(nitrogenSpecificHeatPH * nitrogenVolumeFractionPH)
 	) / 100;
     wasterGasSensible = PH_hourlyWasterGasVolume * wasterGasSpecificHeat * wasterGasTemperaturePH / hourlyClinkerProduction;
+
     return wasterGasSensible;
 }
 // [PASS] 2-26 (success)4-2.离开的飞灰显热
-function cal_Ash_sensible_leavingNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction, ashSpecificHeat, wasterGasTemperaturePH){
-    let ashMassStream = cal_Ash_massStream_enteringNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction);
+function cal_Ash_sensible_leavingNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction, ashSpecificHeat, ashFallVelocity, wasterGasTemperaturePH){
+    let ashMassStream = cal_Ash_massStream_leavingNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction, ashFallVelocity)
     let ashSensible = ashMassStream * ashSpecificHeat * wasterGasTemperaturePH;
+
+    // console.log("LOG", ashSensible, ashMassStream, ashSpecificHeat, wasterGasTemperaturePH);
+
     return ashSensible;
 }
 // [PASS] 2-27 (success)4-3.离开的水蒸气显热
 function cal_waterVapor_sensible_leavingNode(hourlyWaterVaporMassStream, hourlyClinkerProduction, waterVaporTemperature, waterVaporSpecificHeat){
     let waterVaporMassStream = cal_waterVapor_massStream_leavingNode(hourlyWaterVaporMassStream, hourlyClinkerProduction);
     let waterVaporSensible = waterVaporMassStream * waterVaporSpecificHeat * waterVaporTemperature;
+
+    // console.log("LOG", waterVaporSensible);
+
     return waterVaporSensible;
 }
 // [PASS] 2-28 (success)4-4:沉降飞灰的温度
@@ -243,5 +272,8 @@ function cal_ashFall_sensible_leavingNode(
 ){
 	let ashFallMassStream = cal_ashFall_massStream_leavingNode(ashConcentration, PH_hourlyWasterGasVolume, hourlyClinkerProduction, ashFallVelocity)
 	let ashFallSensible = ashFallMassStream * ashFallTemperature * ashSpecificHeat
+
+    // console.log("LOG", ashFallSensible);
+
 	return ashFallSensible
 }

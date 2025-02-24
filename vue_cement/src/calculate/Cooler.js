@@ -109,6 +109,7 @@ function cal_clinker_massStream_enteringNode(){
 // (success)1-2: 冷却空气的物质流
 function cal_air_massStream_enteringNode(hourlyAirVolume, hourlyClinkerProduction, standardAirDensity){
     let airMassStream = hourlyAirVolume * standardAirDensity / hourlyClinkerProduction;
+
     return airMassStream;
 }
 // (success)1-3:
@@ -128,11 +129,13 @@ function cal_total_sensible_enteringNode(hourlyAirVolume, hourlyClinkerProductio
 function cal_clinker_sensible_enteringNode(clinkerSensibleRK){
 	// let clinkerMassStream = cal_clinker_massStream_leavingNode(SecondDustContent, ThirdDustContent)
     // let clinkerSensible = clinkerMassStream * clinkerSpecificHeat * clinkerTemperature;
+
     return clinkerSensibleRK;
 }
 // (success)2-2: 冷却空气的显热
 function cal_air_sensible_enteringNode(hourlyAirVolume, hourlyClinkerProduction,  standardAirSpecificHeat, envTemperature){
     let airSensible = (hourlyAirVolume * envTemperature * standardAirSpecificHeat) / hourlyClinkerProduction
+
     return airSensible
 }
 // (success)2-3: 冷却水
@@ -168,6 +171,7 @@ function cal_clinker_massStream_leavingNode(){
 // (success)3-2: 冷却空气的物质流
 function cal_CoalMillAir_massStream_leavingNode(hourlyCoalMillAirVolume, coalMillAirDensity, hourlyClinkerProduction){
     let airMassStream = (hourlyCoalMillAirVolume * coalMillAirDensity) / hourlyClinkerProduction;
+    
     return airMassStream
 }
 // (success)3-4: 二次空气
@@ -191,11 +195,13 @@ function cal_thirdAir_massStream_leavingNode(thirdAirMassStreamRK){
     //     nitrogenDensityThird * nitrogenVolumeFractionThird) / 100;
 	// let DustMassStream = hourlyThirdAirVolume * ThirdDustContent / hourlyClinkerProduction
     // let thirdAirMassStream = (hourlyThirdAirVolume * thirdAirDensity / hourlyClinkerProduction) + DustMassStream;
+
     return thirdAirMassStreamRK;
 }
 // (success)3-6: AQC空气
 function cal_AQCAir_massStream_leavingNode(hourlyAQCAirVolume, AQCAirDensity, hourlyClinkerProduction){
     let AQCAirMassStream = hourlyAQCAirVolume * AQCAirDensity / hourlyClinkerProduction;
+
     return AQCAirMassStream;
 }
 // // (success)3-7：冷却水
@@ -206,6 +212,7 @@ function cal_AQCAir_massStream_leavingNode(hourlyAQCAirVolume, AQCAirDensity, ho
 // (success)3-8: 冷却机排余风
 function cal_ExcludeAir_massStream_leavingNode(hourlyExcludeAirVolume, excludeAirDensity, hourlyClinkerProduction){
 	let ExcludeAirMassStream = hourlyExcludeAirVolume * excludeAirDensity / hourlyClinkerProduction
+
 	return ExcludeAirMassStream;
 }
 
@@ -226,10 +233,12 @@ function cal_total_sensible_leavingNode(clinkerSpecificHeat, clinkerTemperature,
 function cal_clinker_sensible_leavingNode(clinkerSpecificHeat, clinkerTemperature){
     let ashMassStream = cal_clinker_massStream_leavingNode()
 	let clinkerSensible = ashMassStream * clinkerSpecificHeat * clinkerTemperature
+
     return clinkerSensible
 }
 // (success)4-2: 飞灰显热
 function cal_ash_sensible_leavingNode(secondAirSensibleRK){
+
     return secondAirSensibleRK;
 }
 // // (success)4-3: 二次空气显热
@@ -252,16 +261,19 @@ function cal_ash_sensible_leavingNode(secondAirSensibleRK){
 // (warning)4-3: 三次空气显热
 function cal_thirdAir_sensible_leavingNode(hourlyThirdAirVolume, hourlyClinkerProduction, thirdAirTemperature, thirdAirSpecificHeat){
     let thirdAirSensible = hourlyThirdAirVolume * thirdAirSpecificHeat * thirdAirTemperature / hourlyClinkerProduction;
+
     return thirdAirSensible;
 }
 // (success)4-4: 煤抽冷却机空气显热
 function cal_CoalMillAir_sensible_leavingNode(hourlyCoalMillAirVolume, hourlyClinkerProduction, standardAirSpecificHeat, CoalMillAirTemperature){
     let airSensible = hourlyCoalMillAirVolume * standardAirSpecificHeat * CoalMillAirTemperature / hourlyClinkerProduction;
+    
     return airSensible;
 }
 // (success)4-5: AQC空气显热
 function cal_AQCAir_sensible_leavingNode(hourlyAQCAirVolume, hourlyClinkerProduction, standardAirSpecificHeat, AQCAirTemperature){
     let AQCAirSensible = hourlyAQCAirVolume * standardAirSpecificHeat * AQCAirTemperature / hourlyClinkerProduction
+
     return AQCAirSensible
 }
 // (success)4-7:冷却水
@@ -274,5 +286,6 @@ function cal_AQCAir_sensible_leavingNode(hourlyAQCAirVolume, hourlyClinkerProduc
 // (success)4-8: 冷却机排余风
 function cal_ExcludeAir_sensible_leavingNode(hourlyExcludeAirVolume, hourlyClinkerProduction, standardAirSpecificHeat, ExcludeAirTemperature){
 	let ExcludeAirSensible = hourlyExcludeAirVolume * standardAirSpecificHeat * ExcludeAirTemperature / hourlyClinkerProduction
+
 	return ExcludeAirSensible
 }

@@ -80,16 +80,21 @@ function cal_total_massStream_enteringNode(hourlyRawMaterial, hourlyClinkerProdu
     let ashMassStream = cal_Ash_massStream_enteringNode(ashMassStreamPH)
 
     let totalEnteringMassStream = rawMaterialMassStream + ashMassStream + airMassStream + wasterGasMassStream
+
+
     return totalEnteringMassStream
 }
 // [PASS] 2-29 (success)1-1.进入的生料量
 function cal_rawMaterial_massStream_enteringNode(hourlyRawMaterial, hourlyClinkerProduction){
     let rawMaterialMassStream = hourlyRawMaterial / hourlyClinkerProduction;
+
+
     return rawMaterialMassStream;
 }
 // [PASS] 2-30 (success)1-2.进入的空气（生料代入的空气）
 function cal_air_massStream_enteringNode(hourlyAirVolume, hourlyClinkerProduction, standardAirDensity){
     let airMassStream = hourlyAirVolume * standardAirDensity / hourlyClinkerProduction;
+
     return airMassStream;
 }
 // [PASS] 2-31 (success)1-3.来自分解炉的废气
@@ -102,6 +107,8 @@ function cal_wasterGas_massStream_enteringNode(SP_hourlyWasterGasVolume, hourlyC
 
     let WASTERGASDENSITY = 0.349
     let wasterGasMassStream = (SP_hourlyWasterGasVolume * WASTERGASDENSITY) / hourlyClinkerProduction;
+
+
     return wasterGasMassStream;
 }
 // [PASS] 2-33 (success)1-4.来自分解炉的飞灰
@@ -111,6 +118,7 @@ function cal_wasterGas_massStream_enteringNode(SP_hourlyWasterGasVolume, hourlyC
 //     return ashMassStream;
 // }
 function cal_Ash_massStream_enteringNode(ashMassStreamPH){
+
     return ashMassStreamPH;
 }
 
@@ -121,6 +129,8 @@ function cal_total_sensible_enteringNode(hourlyAirVolume, hourlyClinkerProductio
     let wasterGasSensible = cal_wasterGas_sensible_enteringNode(SP_hourlyWasterGasVolume, hourlyClinkerProduction, wasterTemperature)
     let ashSensible = cal_Ash_sensible_enteringNode(ashMassStreamPH, ashSpecificHeat, wasterTemperature)
     let totalEnteringSensible = rawMaterialSensible + airSensible + wasterGasSensible + ashSensible
+
+
     return totalEnteringSensible;
 }
 // [PASS] 2-36 (success)2-1.进入的生料量的显热
@@ -128,14 +138,18 @@ function cal_rawMaterial_sensible_enteringNode(hourlyRawMaterial, hourlyClinkerP
     // rawMaterialTemperature : 生料的温度
 	let rawMaterialMassStream = cal_rawMaterial_massStream_enteringNode(hourlyRawMaterial, hourlyClinkerProduction)
 
-    let rawMaterialMassStreamSpecificHeat = (0.88 + 2.93e4 * rawMaterialTemperature) * (1 - rawMaterialWaterContent) + 4.1816 * rawMaterialWaterContent;
+    let rawMaterialMassStreamSpecificHeat = (0.88 + 2.93 * 0.0001 * rawMaterialTemperature) * (1 - rawMaterialWaterContent) + 4.1816 * rawMaterialWaterContent;
 	let rawMaterialSensible = rawMaterialMassStream * rawMaterialMassStreamSpecificHeat * rawMaterialTemperature
+
+
     return rawMaterialSensible;
 }
 // [PASS] 2-37 (success)2-2. 进入的空气显热（生料代入的空气）
 function cal_air_sensible_enteringNode(hourlyAirVolume, hourlyClinkerProduction, airTemperature){
     let STANDARDAIRSPECIFICHEAT = 1.296
     let airSensible = hourlyAirVolume / hourlyClinkerProduction * STANDARDAIRSPECIFICHEAT * airTemperature;
+
+
     return airSensible;
 }
 // [PASS] 2-38 (success)2-3.来自分解炉的废气显热
@@ -143,12 +157,16 @@ function cal_wasterGas_sensible_enteringNode(SP_hourlyWasterGasVolume, hourlyCli
 
     let WASTERGASSPECIFICHEAT = 1.384
     let wasterGasSensible = SP_hourlyWasterGasVolume / hourlyClinkerProduction * WASTERGASSPECIFICHEAT * wasterTemperature;
+
+
     return wasterGasSensible;
 }
 // [PASS] 2-40（success）2-4.来自分解炉的飞灰显热
 function cal_Ash_sensible_enteringNode(ashMassStreamPH, ashSpecificHeat, wasterTemperature){
     let ashMassStream = cal_Ash_massStream_enteringNode(ashMassStreamPH)
     let ashSensible = ashMassStream * ashSpecificHeat * wasterTemperature;
+
+
     return ashSensible
 }
 // 3.离开悬浮预热器的物质总和
@@ -158,6 +176,8 @@ function cal_total_massStream_leavingNode(hourlyRawMaterial, hourlyClinkerProduc
     let ashMassStream = cal_ash_massStream_leavingNode(ashMassStreamPH)
 
     let totalLeavingMassStream = rawMaterialMassStream + wasterGasMassStream + ashMassStream
+
+
     return totalLeavingMassStream;
 }
 // [PASS] 2-43 3-1.出口的生料
@@ -166,6 +186,8 @@ function cal_rawMaterial_massStream_leavingNode(hourlyRawMaterial, hourlyClinker
     let temp_rawMaterialMassStream = cal_rawMaterial_massStream_enteringNode(hourlyRawMaterial, hourlyClinkerProduction)
     // let rawMaterialMassStream = hourlyRawMaterialC5 / hourlyClinkerProduction;
     let rawMaterialMassStream = temp_rawMaterialMassStream * (100 - rawMaterialWaterContent)/100;
+
+
     return rawMaterialMassStream;
 }
 // [WARNING] (success)3-2.出口的废气
@@ -174,6 +196,7 @@ function cal_rawMaterial_massStream_leavingNode(hourlyRawMaterial, hourlyClinker
 //     return wasterGasMassStream;
 // }
 function cal_wasterGas_massStream_leavingNode(wasterGasMassStreamPH){
+
     return wasterGasMassStreamPH;
 }
 
@@ -183,6 +206,8 @@ function cal_wasterGas_massStream_leavingNode(wasterGasMassStreamPH){
 //     return ashMassStream;
 // }
 function cal_ash_massStream_leavingNode(ashMassStreamPH){
+
+
     return ashMassStreamPH;
 }
 
@@ -201,6 +226,8 @@ function cal_total_sensible_leavingNode(hourlyRawMaterial, hourlyClinkerProducti
 function cal_rawMaterial_sensible_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, rawMaterialSpecificHeatC2, rawMaterialTemperatureC2, rawMaterialWaterContent){
     let rawMaterialMassStream = cal_rawMaterial_massStream_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, rawMaterialWaterContent);
     let rawMaterialSensible = rawMaterialMassStream * rawMaterialSpecificHeatC2 * rawMaterialTemperatureC2;
+
+
     return rawMaterialSensible;
 }
 // (success)4-2. 废气
@@ -212,6 +239,7 @@ function cal_rawMaterial_sensible_leavingNode(hourlyRawMaterial, hourlyClinkerPr
 //     return wasterGasSensible;
 // }
 function cal_wasterGas_sensible_leavingNode(wasterGasSensiblePH){
+
     return wasterGasSensiblePH;
 }
 // (success)4-3. 飞灰
@@ -221,6 +249,7 @@ function cal_wasterGas_sensible_leavingNode(wasterGasSensiblePH){
 //     return ashSensible;
 // }
 function cal_Ash_sensible_leavingNode(ashSensiblePH){
+
     return ashSensiblePH;
 }
 // [PASS] 2-46 4-4. 水蒸气
@@ -228,5 +257,6 @@ function cal_waterVapor_sensible_leavingNode(hourlyRawMaterial, hourlyClinkerPro
     let rawMaterialMassStream = cal_rawMaterial_massStream_enteringNode(hourlyRawMaterial, hourlyClinkerProduction)
     let waterVaporSensible = rawMaterialMassStream * (rawMaterialWaterContent / 100) * heatOfVaporization
     // heatOfVaporization : 水的气化热
+
     return waterVaporSensible;
 }

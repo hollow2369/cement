@@ -35,8 +35,9 @@ export function fun6(
     // 可计算物质流损失比和热效率
     let massStreamRatio = totalLeavingMassStream / totalEnteringMassStream * 100;
     let thermalEfficiency = totalLeavingSensible / totalEnteringSensible * 100;
-
-    return [[massStreamRatio, thermalEfficiency,] [totalEnteringMassStream, totalEnteringSensible, totalLeavingMassStream, totalLeavingSensible]];
+    console.log("THIS IS FUN6", massStreamRatio, thermalEfficiency);
+    
+    return [massStreamRatio, thermalEfficiency];
 }
 
 function cal_total_massStream_enteringNode(hourlyAQCWater, hourlyClinkerProduction, AQCAirMassStreamC) {
@@ -49,6 +50,7 @@ function cal_total_massStream_enteringNode(hourlyAQCWater, hourlyClinkerProducti
 }
 // (success)1-1：来自冷却机的空气
 function cal_AQCAir_massStream_enteringNode(AQCAirMassStreamC){
+
     return AQCAirMassStreamC;
 }
 // // (success)1-2：来自冷却机的飞灰
@@ -59,6 +61,7 @@ function cal_AQCAir_massStream_enteringNode(AQCAirMassStreamC){
 // (success)1-3：来自冷却机的液态水
 function cal_liquidWater_massStream_enteringNode(hourlyAQCWater, hourlyClinkerProduction){
     let liquidWaterMassStream = hourlyAQCWater / hourlyClinkerProduction;
+
     return liquidWaterMassStream;
 }
 
@@ -73,6 +76,7 @@ function cal_total_sensible_enteringNode(hourlyClinkerProduction, hourlyAQCWater
 // (success)2-1：空气显热
 function cal_AQCAir_sensible_enteringNode(AQCAirSensibleC){
     // let AQCAirSensible = hourlyAQCAirVolume * standardAirSpecificHeat * AQCAirTemperature / hourlyClinkerProduction
+
     return AQCAirSensibleC
 }
 // (success)2-2：冷却机飞灰显热
@@ -85,6 +89,7 @@ function cal_AQCAir_sensible_enteringNode(AQCAirSensibleC){
 function cal_liquidWater_sensible_enteringNode(hourlyAQCWater, hourlyClinkerProduction, liquidWaterSpecificHeat, liquidWaterTemperature){
     let liquidWaterMassStream = cal_liquidWater_massStream_enteringNode(hourlyAQCWater, hourlyClinkerProduction)
     let liquidWaterSensible = liquidWaterMassStream * liquidWaterSpecificHeat * liquidWaterTemperature
+
     return liquidWaterSensible
 }
 
@@ -101,6 +106,7 @@ function cal_total_massStream_leavingNode(hourlyWaterVaporMassStream, hourlyClin
 // (success)3-1：离开的空气物质流
 function cal_AQCAir_massStream_leavingNode(AQCAirMassStreamC){
     let AQCAirMassStream = cal_AQCAir_massStream_enteringNode(AQCAirMassStreamC)
+
     return AQCAirMassStream;
 }
 // // (success)3-2：离开的飞灰物质流
@@ -112,6 +118,7 @@ function cal_AQCAir_massStream_leavingNode(AQCAirMassStreamC){
 // (success)3-2：离开的水蒸气物质流
 function cal_waterVapor_massStream_leavingNode(hourlyWaterVaporMassStream, hourlyClinkerProduction){
     let waterVaporMassStream = hourlyWaterVaporMassStream / hourlyClinkerProduction;
+    
     return waterVaporMassStream
 }
 // // (success)3-4: 沉降的飞灰
@@ -135,6 +142,7 @@ function cal_total_sensible_leavingNode(hourlyAQCAirVolume, standardAirSpecificH
 // (success)4-1：空气显热
 function cal_air_sensible_leavingNode(hourlyAQCAirVolume, hourlyClinkerProduction, standardAirSpecificHeat, OutAQCAirTemperature){
     let airSensible = (hourlyAQCAirVolume / hourlyClinkerProduction) * standardAirSpecificHeat * OutAQCAirTemperature
+
     return airSensible
 }
 // // (success)4-2：飞灰显热
@@ -146,6 +154,7 @@ function cal_air_sensible_leavingNode(hourlyAQCAirVolume, hourlyClinkerProductio
 function cal_waterVapor_sensible_leavingNode(hourlyWaterVaporMassStream, hourlyClinkerProduction, waterVaporSpecificHeat, waterVaporTemperature){
     let temp = cal_waterVapor_massStream_leavingNode(hourlyWaterVaporMassStream, hourlyClinkerProduction)
     let waterVaporSensible = temp * waterVaporSpecificHeat * waterVaporTemperature
+
     return waterVaporSensible
 }
 // (success)4-4:飞灰沉降温度
