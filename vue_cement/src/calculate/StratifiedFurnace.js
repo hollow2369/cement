@@ -112,7 +112,7 @@ export function fun3(
     ashSensibleSP
 ){
     let totalEnteringMassStream = cal_total_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, hourlySendCoalAirVolume, hourlyThirdAirVolume, thirdAirDensity, hourlyLeakageVolume, standardAirDensity, hourlySecondAirVolume, hourlyFirstAirVolumeRK, carbonMonoxideDensityWasterGasRK, carbonDioxideDensityWasterGasRK, oxygenDensityWasterGasRK, nitrogenDensityWasterGasRK, carbonMonoxideVolumeFractionWasterGasRK, carbonDioxideVolumeFractionWasterGasRK, oxygenVolumeFractionWasterGasRK, nitrogenVolumeFractionWasterGasRK, hourlyOthersMass, rawMaterialMassStreamSP);
-    let totalEnteringSensible = cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderTemperature, coalPowderSpecificHeat, hourlySendCoalAirVolume,standardAirSpecificHeat, sendCoalAirTemperature, hourlyThirdAirVolume, thirdAirSpecificHeat, thirdAirTemperature, rawMaterialSensibleSP, hourlyLeakageVolume, envTemperature, coalHeatingValue, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas, hourlyOthersMass, othersSpecificHeat, othersTemperature, othersHeatingValue, hourlySecondAirVolume, hourlyFirstAirVolumeRK)
+    let totalEnteringSensible = cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderTemperature, coalPowderSpecificHeat, hourlySendCoalAirVolume,standardAirSpecificHeat, sendCoalAirTemperature, hourlyThirdAirVolume, thirdAirSpecificHeat, thirdAirTemperature, rawMaterialSensibleSP, hourlyLeakageVolume, envTemperature, coalHeatingValue, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas, hourlyOthersMass, othersSpecificHeat, othersTemperature, othersHeatingValue, hourlySecondAirVolume, hourlyFirstAirVolumeRK)[0]
     let totalLeavingMassStream = cal_total_massStream_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, calciumOxideContent, magnesiumOxideContent, wasterGasMassStreamSP, ashMassStreamSP)
     let totalLeavingSensible = cal_total_energyStream_leavingNode(rawMaterialSpecificHeat, rawMaterialTemperature, wasterGasSensibleSP, ashSensibleSP, ashMassStreamSP, calciumOxideContent, magnesiumOxideContent, ashBurnLoss, rawMaterialBurnLoss, rawMaterialWaterContent, hourlyRawMaterial, hourlyClinkerProduction)
 
@@ -129,12 +129,18 @@ export function fun3(
     let coalPowderBurningSensible = cal_coalPowderBurning_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalHeatingValue)
     let thirdAirMassStreamSF = cal_thirdAir_massStream_enteringNode(hourlyThirdAirVolume, hourlyClinkerProduction, thirdAirDensity)
 
+    // 系统总热量
+    let systemRatio_SF = cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderTemperature, coalPowderSpecificHeat, hourlySendCoalAirVolume,standardAirSpecificHeat, sendCoalAirTemperature, hourlyThirdAirVolume, thirdAirSpecificHeat, thirdAirTemperature, rawMaterialSensibleSP, hourlyLeakageVolume, envTemperature, coalHeatingValue, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas, hourlyOthersMass, othersSpecificHeat, othersTemperature, othersHeatingValue, hourlySecondAirVolume, hourlyFirstAirVolumeRK)[1]
+
+    let coalPowderMassStreamSF = cal_coalPowder_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction)
+
     console.log("ARG", ashMassStreamSP);
     
     return [
         [massStreamRatio, thermalEfficiency], 
-        [outRawMaterialMassStreamSF, rawMaterialSensibleSF, wasterGasMassStreamSF, wasterGasSensibleSF, coalPowderBurningSensible, ashSensibleSP, thirdAirMassStreamSF], 
-        [totalEnteringMassStream, totalEnteringSensible, totalLeavingMassStream, totalLeavingSensible]
+        [outRawMaterialMassStreamSF, rawMaterialSensibleSF, wasterGasMassStreamSF, wasterGasSensibleSF, coalPowderBurningSensible, ashSensibleSP, thirdAirMassStreamSF, coalPowderMassStreamSF, coalHeatingValue], 
+        [totalEnteringMassStream, totalEnteringSensible, totalLeavingMassStream, totalLeavingSensible],
+        [systemRatio_SF]
     ];
 }
 // (success)1
@@ -221,8 +227,8 @@ function cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProducti
     let othersBurningSensible = cal_othersBurning_sensible_enteringNode(hourlyOthersMass, hourlyClinkerProduction, othersHeatingValue)
 
     let totalEnteringNodeSensible = coalPowderSensible + sendCoalAirSensible + thirdAirSensible + rawMaterialSensible + leakageSensible + coalPowderBurningSensible + wasterGasSensible + othersSensible + othersBurningSensible
- 
-    return totalEnteringNodeSensible;
+    let systemRatio_SF = coalPowderBurningSensible+coalPowderSensible+sendCoalAirSensible+ othersSensible+ othersBurningSensible+leakageSensible
+    return [totalEnteringNodeSensible, systemRatio_SF];
 }
 // (success)2-1
 function cal_coalPowder_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderTemperature, coalPowderSpecificHeat){

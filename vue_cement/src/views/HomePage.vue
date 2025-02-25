@@ -153,19 +153,17 @@
               <div class="output_draw">
                 <div class="chart_item">
                   <div class="chart_title">
-                    流程对应物质流比值
+                    
                   </div>
                   <div class="pie_chart" ref="pieChart1"></div>
                 </div>
                 <div class="chart_item">
                   <div class="chart_title">
-                    模型对应热效率
                   </div>
                   <div class="pie_chart" ref="pieChart2"></div>
                 </div>
                 <div class="chart_item">
                   <div class="chart_title">
-                    模型对应热损失
                   </div>
                   <div class="pie_chart" ref="pieChart3"></div>
                 </div>
@@ -363,19 +361,38 @@ export default {
     handleSuccess(file, fileList){
       this.uploadFiles = fileList
     },
-    createChart(param, values){
+    createChart(param, values, plot_title="等待输出"){
       const myChart = echarts.init(param);
       let percentage = (values).toFixed(1);
       // let percentage = (values * 100).toFixed(1);
       const option = {
-        title: {
-          text: percentage + "%" ,
-          left: 'center',
-          top: 61.5,
-          textStyle:{
-            color:'#1890fe'
+        // title: {
+        //   text: percentage + "%" ,
+        //   subtext: "SUBTEXTTTT",
+        //   left: 'center',
+        //   top: 61.5,
+        //   textStyle:{
+        //     color:'#1890fe'
+        //   }
+        // },
+        title: [
+          {
+            text: plot_title ,
+            left: 'center',
+            top: 0,
+            textStyle:{
+              color:'#808080'
+            }
+          },
+          {
+            text: percentage + "%" ,
+            left: 'center',
+            top: 61.5,
+            textStyle:{
+              color:'#1890fe'
+            }
           }
-        },
+        ],
         visualMap: {
           show: false,
         },
@@ -495,46 +512,49 @@ export default {
       // console.log(argList_AQC);
       // console.log(result_AQC);
       
-      console.log("dataList cal");
-
+      // console.log("dataList cal");
+      let QZS = result_SP[3][0] + result_SF[3][0] + result_RK[3][0] + result_C[3][0]
+      let Qsh = result_RK[3][1]
+      let systemRatio = Qsh / QZS * 100
       switch(this.flow){    
         case "PH_Boiler":
-          this.createChart(this.$refs.pieChart1, result_PH[2][0])
-          this.createChart(this.$refs.pieChart2, result_PH[2][1])
-          this.createChart(this.$refs.pieChart3, (100 - result_PH[2][1]))
+          this.createChart(this.$refs.pieChart1, result_PH[2][0], "PH锅炉物质比")
+          this.createChart(this.$refs.pieChart2, result_PH[2][1], "PH锅炉热效率")
+          this.createChart(this.$refs.pieChart3, (100 - result_PH[2][1]), "PH锅炉热损失")
           break
         case "SuspensionPreheater":
         
-          this.createChart(this.$refs.pieChart1, result_SP[2][0])
-          this.createChart(this.$refs.pieChart2, result_SP[2][1])
-          this.createChart(this.$refs.pieChart3, (100 - result_SP[2][1]))
+          this.createChart(this.$refs.pieChart1, result_SP[2][0], "预热器物质比")
+          this.createChart(this.$refs.pieChart2, result_SP[2][1], "预热器热效率")
+          this.createChart(this.$refs.pieChart3, (100 - result_SP[2][1]), "预热器热损失")
           break
         case "StratifiedFurnace":
-          this.createChart(this.$refs.pieChart1, result_SF[0][0])
-          this.createChart(this.$refs.pieChart2, result_SF[0][1])
-          this.createChart(this.$refs.pieChart3, (100 - result_SF[0][1]))
+          this.createChart(this.$refs.pieChart1, result_RK[0][3], "标准煤耗用量")
+          this.createChart(this.$refs.pieChart2, result_SF[0][1], "分解炉热效率")
+          this.createChart(this.$refs.pieChart3, (100 - result_SF[0][1]), "分解炉热损失")
           break
         case "RotaryKiln":
-          this.createChart(this.$refs.pieChart1, result_RK[0][0])
-          this.createChart(this.$refs.pieChart2, result_RK[0][1])
-          this.createChart(this.$refs.pieChart3, (100 - result_RK[0][1]))
+
+          this.createChart(this.$refs.pieChart1, systemRatio, "回转窑系统总热率")
+          this.createChart(this.$refs.pieChart2, result_RK[0][1], "回转窑热效率")
+          this.createChart(this.$refs.pieChart3, result_RK[0][2], "回转窑能效比")
           break
         case "Cooler":
-          this.createChart(this.$refs.pieChart1, result_C[0][0])
-          this.createChart(this.$refs.pieChart2, result_C[0][1])
-          this.createChart(this.$refs.pieChart3, (100 - result_C[0][1]))
+          this.createChart(this.$refs.pieChart1, result_C[0][0], "冷却机物质比")
+          this.createChart(this.$refs.pieChart2, result_C[0][1], "冷却机热效率")
+          this.createChart(this.$refs.pieChart3, result_C[0][2], "冷却机回收比")
           break
         case "AQCBoilder":
-          this.createChart(this.$refs.pieChart1, result_AQC[0])
-          this.createChart(this.$refs.pieChart2, result_AQC[1])
-          this.createChart(this.$refs.pieChart3, (100 - result_AQC[1]))
+          this.createChart(this.$refs.pieChart1, result_AQC[0], "AQC物质比")
+          this.createChart(this.$refs.pieChart2, result_AQC[1], "AQC热效率")
+          this.createChart(this.$refs.pieChart3, (100 - result_AQC[1]), "AQC热损失")
           console.log(argList_AQC, result_AQC);
           
           break
         default:
-          this.createChart(this.$refs.pieChart1, result_PH[2][0])
-          this.createChart(this.$refs.pieChart2, result_PH[2][1])
-          this.createChart(this.$refs.pieChart3, (100 - result_PH[2][1]))
+          this.createChart(this.$refs.pieChart1, result_PH[2][0], "PH锅炉物质比")
+          this.createChart(this.$refs.pieChart2, result_PH[2][1], "PH锅炉热效率")
+          this.createChart(this.$refs.pieChart3, (100 - result_PH[2][1]), "PH锅炉热损失")
           break
 			}
 

@@ -32,10 +32,13 @@ export function fun6(
 
     let totalLeavingSensible = cal_total_sensible_leavingNode(hourlyAQCAirVolume, standardAirSpecificHeat, OutAQCAirTemperature, hourlyWaterVaporMassStream, hourlyClinkerProduction, waterVaporSpecificHeat, waterVaporTemperature)
 
+    // let waterVapor_sensible = cal_waterVapor_sensible_leavingNode(hourlyWaterVaporMassStream, hourlyClinkerProduction, waterVaporSpecificHeat, waterVaporTemperature)
+
     // 可计算物质流损失比和热效率
     let massStreamRatio = totalLeavingMassStream / totalEnteringMassStream * 100;
     let thermalEfficiency = totalLeavingSensible / totalEnteringSensible * 100;
-    console.log("THIS IS FUN6", massStreamRatio, thermalEfficiency);
+    // let thermalEfficiency = waterVapor_sensible / totalEnteringSensible * 100;
+    console.log("THIS IS FUN6", totalLeavingSensible);
     
     return [massStreamRatio, thermalEfficiency];
 }

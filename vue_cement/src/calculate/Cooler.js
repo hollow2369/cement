@@ -81,15 +81,16 @@ export function fun5(
     let airSensible = cal_CoalMillAir_sensible_leavingNode(hourlyCoalMillAirVolume, hourlyClinkerProduction, standardAirSpecificHeat, CoalMillAirTemperature)
 
     let thermalEfficiency = (secondAirSensibleRK + thirdAirSensible + AQCAirSensible + airSensible) / (totalEnteringSensible) * 100;
-
+    let recyclingEfficiency = (secondAirSensibleRK + thirdAirSensible) / (totalEnteringSensible) * 100;
     // temp
     let AQCAirSensibleC = cal_AQCAir_sensible_leavingNode(hourlyAQCAirVolume, hourlyClinkerProduction, standardAirSpecificHeat, AQCAirTemperature)
     let AQCAirMassStreamC = cal_AQCAir_massStream_leavingNode(hourlyAQCAirVolume, AQCAirDensity, hourlyClinkerProduction)
 
     return [
-        [massStreamRatio, thermalEfficiency],
+        [massStreamRatio, thermalEfficiency, recyclingEfficiency],
         [AQCAirMassStreamC, AQCAirSensibleC],
-        [totalEnteringMassStream, totalEnteringSensible, totalLeavingMassStream, totalLeavingSensible]
+        [totalEnteringMassStream, totalEnteringSensible, totalLeavingMassStream, totalLeavingSensible],
+        [cal_air_sensible_enteringNode(hourlyAirVolume, hourlyClinkerProduction,  standardAirSpecificHeat, envTemperature)]
     ];
 }
 

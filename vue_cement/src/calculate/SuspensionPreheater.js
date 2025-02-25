@@ -46,7 +46,7 @@ export function fun2(
     ashSensiblePH
 ){
     let totalEnteringMassStream = cal_total_massStream_enteringNode(hourlyRawMaterial, hourlyClinkerProduction, hourlyAirVolume, SP_hourlyWasterGasVolume, standardAirDensity, ashMassStreamPH)
-    let totalEnteringSensible = cal_total_sensible_enteringNode(hourlyAirVolume, hourlyClinkerProduction, SP_hourlyWasterGasVolume, rawMaterialTemperature, wasterTemperature, rawMaterialWaterContent, ashSpecificHeat, hourlyRawMaterial, airTemperature, ashMassStreamPH)
+    let totalEnteringSensible = cal_total_sensible_enteringNode(hourlyAirVolume, hourlyClinkerProduction, SP_hourlyWasterGasVolume, rawMaterialTemperature, wasterTemperature, rawMaterialWaterContent, ashSpecificHeat, hourlyRawMaterial, airTemperature, ashMassStreamPH)[0]
     let totalLeavingMassStream = cal_total_massStream_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, wasterGasMassStreamPH, ashMassStreamPH, rawMaterialWaterContent)
     let totalLeavingSensible = cal_total_sensible_leavingNode(hourlyRawMaterial, hourlyClinkerProduction, rawMaterialSpecificHeatC2, rawMaterialTemperatureC2, rawMaterialWaterContent, heatOfVaporization, wasterGasSensiblePH, ashSensiblePH)
 
@@ -64,10 +64,14 @@ export function fun2(
     let ashSensibleSP = cal_Ash_sensible_enteringNode(ashMassStreamPH, ashSpecificHeat, wasterTemperature)
 
 
+
+    let systemRatio_SP = cal_total_sensible_enteringNode(hourlyAirVolume, hourlyClinkerProduction, SP_hourlyWasterGasVolume, rawMaterialTemperature, wasterTemperature, rawMaterialWaterContent, ashSpecificHeat, hourlyRawMaterial, airTemperature, ashMassStreamPH)[1]
+
     return [
         [totalEnteringMassStream, totalEnteringSensible, totalLeavingMassStream, totalLeavingSensible], 
         [rawMaterialMassStreamSP, rawMaterialSensibleSP, wasterGasMassStreamSP, ashMassStreamSP, wasterGasSensibleSP, ashSensibleSP], 
         [massStreamRatio, thermalEfficiency], 
+        [systemRatio_SP]
     ];
     //return [totalEnteringMassStream,totalEnteringSensible,totalLeavingMassStream,totalLeavingSensible];
 }
@@ -130,8 +134,9 @@ function cal_total_sensible_enteringNode(hourlyAirVolume, hourlyClinkerProductio
     let ashSensible = cal_Ash_sensible_enteringNode(ashMassStreamPH, ashSpecificHeat, wasterTemperature)
     let totalEnteringSensible = rawMaterialSensible + airSensible + wasterGasSensible + ashSensible
 
+    let systemRatio_SP = (rawMaterialSensible + airSensible)
 
-    return totalEnteringSensible;
+    return [totalEnteringSensible, systemRatio_SP];
 }
 // [PASS] 2-36 (success)2-1.进入的生料量的显热
 function cal_rawMaterial_sensible_enteringNode(hourlyRawMaterial, hourlyClinkerProduction, rawMaterialTemperature, rawMaterialWaterContent){

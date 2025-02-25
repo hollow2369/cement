@@ -88,10 +88,12 @@ export function fun4(
     wasterGasSensibleSF,
     coalPowderBurningSensibleSF,
     ashSensibleSF,
-    thirdAirMassStreamSF
+    thirdAirMassStreamSF,
+    coalPowderMassStreamSF,
+    coalHeatingValueSF,
 ){
     let totalEnteringMassStream = cal_total_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, hourlyFirstAirVolume, standardAirDensity, hourlySecondAirVolume, secondAirDensity, hourlySendCoalAirVolume, outRawMaterialMassStreamSF)
-    let totalEnteringSensible = cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderSpecificHeat, coalPowderTemperature, hourlyFirstAirVolume, standardAirSpecificHeat, envTemperature, hourlySecondAirVolume, secondAirTemperature, secondAirSpecificHeat, coalHeatingValue, hourlySendCoalAirVolume, rawMaterialSensibleSF)
+    let totalEnteringSensible = cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderSpecificHeat, coalPowderTemperature, hourlyFirstAirVolume, standardAirSpecificHeat, envTemperature, hourlySecondAirVolume, secondAirTemperature, secondAirSpecificHeat, coalHeatingValue, hourlySendCoalAirVolume, rawMaterialSensibleSF)[0]
     let totalLeavingMassStream = cal_total_massStream_leavingNode(wasterGasMassStreamSF)
     let totalLeavingSensible = cal_total_sensible_leavingNode(clinkerSpecificHeat, clinkerTemperature, hourlyWasterGasVolume, hourlyClinkerProduction, carbonMonoxideVolumeFractionWasterGas, rawMaterialLoss, aluminumOxideContent, magnesiumOxideContent, calciumOxideContent, siliconDioxideContent, ironOxideContent, wasterGasSensibleSF)
 
@@ -101,18 +103,29 @@ export function fun4(
     // 可计算物质流损失比和热效率
     let massStreamRatio = totalLeavingMassStream / totalEnteringMassStream * 100;
     // let thermalEfficiency = totalLeavingSensible / totalEnteringSensible * 100;
+    // 热效率
     let thermalEfficiency = clinkerFormationSensible / (coalPowderBurningSensible + coalPowderBurningSensibleSF) * 100;
+    // 能效比
+    let EfficiencyRatio = (totalLeavingSensible / totalEnteringSensible) * 100;
+    // 煤粉消耗量
+    let coalPowderMassStreamRK = cal_coalPowder_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction)
+    let coalLossRatio = ((coalPowderMassStreamSF + coalPowderMassStreamRK) * 1000 * coalHeatingValueSF) / 29307.6
 
     let clinkerSensibleRK = cal_clinker_sensible_leavingNode( clinkerSpecificHeat, clinkerTemperature)
     let secondAirMassStreamRK = cal_secondAir_massStream_enteringNode(hourlySecondAirVolume, hourlyClinkerProduction, secondAirDensity)
     let thirdAirMassStreamRK = thirdAirMassStreamSF
     // let ashSensibleRK = ashSensibleSF
     let secondAirSensibleRK = cal_secondAir_sensible_enteringNode(hourlySecondAirVolume, hourlyClinkerProduction, secondAirTemperature, secondAirSpecificHeat)
+    console.log(thermalEfficiency, EfficiencyRatio, "XX");
     
+
+    let systemRatio_RK = cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderSpecificHeat, coalPowderTemperature, hourlyFirstAirVolume, standardAirSpecificHeat, envTemperature, hourlySecondAirVolume, secondAirTemperature, secondAirSpecificHeat, coalHeatingValue, hourlySendCoalAirVolume, rawMaterialSensibleSF)[1]
+    let Qsh = cal_clinkerFormation_sensible_leavingNode(aluminumOxideContent, magnesiumOxideContent, calciumOxideContent, siliconDioxideContent, ironOxideContent)
     return [
-        [massStreamRatio, thermalEfficiency], 
+        [massStreamRatio, thermalEfficiency, EfficiencyRatio, coalLossRatio], 
         [clinkerSensibleRK, secondAirMassStreamRK, thirdAirMassStreamRK, secondAirSensibleRK],
-        [totalEnteringMassStream, totalEnteringSensible, totalLeavingMassStream, totalLeavingSensible]
+        [totalEnteringMassStream, totalEnteringSensible, totalLeavingMassStream, totalLeavingSensible],
+        [systemRatio_RK, Qsh]
     ];
 }
 // 1.进入冷却炉的物质流
@@ -178,8 +191,8 @@ function cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProducti
 	let organicWasterLiquidBurningSensible = cal_organicWasterLiquidBurning_Sensible_enteringNode()
 
     let totalEnteringNodeSensible = coalPowderBurningSensible + firstAirSensible + secondAirSensible + coalPowderSensible + rawMaterialSensible + sendCoalAirSensible + organicWasterLiquidBurningSensible
-    
-    return totalEnteringNodeSensible
+    let systemRatio_RK = (coalPowderSensible + coalPowderBurningSensible + sendCoalAirSensible + firstAirSensible)
+    return [totalEnteringNodeSensible, systemRatio_RK]
 }
 // (success)2-1: 煤粉的显热
 function cal_coalPowder_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderSpecificHeat, coalPowderTemperature){
@@ -261,8 +274,9 @@ function cal_total_sensible_leavingNode(clinkerSpecificHeat, clinkerTemperature,
     let clinkerSensible = cal_clinker_sensible_leavingNode(clinkerSpecificHeat, clinkerTemperature)
     let coalPowderChemistryBurningSensible = cal_coalPowderChemistryBurning_sensible_leavingNode(hourlyWasterGasVolume, hourlyClinkerProduction, carbonMonoxideVolumeFractionWasterGas)
     let coalPowderMachineryBurningSensible = cal_coalPowderMachineryBurning_sensible_leavingNode(rawMaterialLoss)
-    let clinkerFormationSensible = cal_clinkerFormation_sensible_leavingNode(aluminumOxideContent, magnesiumOxideContent, calciumOxideContent, siliconDioxideContent, ironOxideContent)
-    let totalLeavingNodeSensible = wasterGasSensible + clinkerSensible + coalPowderChemistryBurningSensible + coalPowderMachineryBurningSensible + clinkerFormationSensible
+    // let clinkerFormationSensible = cal_clinkerFormation_sensible_leavingNode(aluminumOxideContent, magnesiumOxideContent, calciumOxideContent, siliconDioxideContent, ironOxideContent)
+    // let totalLeavingNodeSensible = wasterGasSensible + clinkerSensible + coalPowderChemistryBurningSensible + coalPowderMachineryBurningSensible + clinkerFormationSensible
+    let totalLeavingNodeSensible = wasterGasSensible + clinkerSensible + coalPowderChemistryBurningSensible + coalPowderMachineryBurningSensible
     return totalLeavingNodeSensible
 }
 // (success)4-1: 窑尾废气显热
