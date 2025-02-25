@@ -121,11 +121,17 @@ export function fun4(
 
     let systemRatio_RK = cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderSpecificHeat, coalPowderTemperature, hourlyFirstAirVolume, standardAirSpecificHeat, envTemperature, hourlySecondAirVolume, secondAirTemperature, secondAirSpecificHeat, coalHeatingValue, hourlySendCoalAirVolume, rawMaterialSensibleSF)[1]
     let Qsh = cal_clinkerFormation_sensible_leavingNode(aluminumOxideContent, magnesiumOxideContent, calciumOxideContent, siliconDioxideContent, ironOxideContent)
+ 
+    let organicWasterLiquidBurningSensible = cal_organicWasterLiquidBurning_Sensible_enteringNode()
     return [
         [massStreamRatio, thermalEfficiency, EfficiencyRatio, coalLossRatio], 
         [clinkerSensibleRK, secondAirMassStreamRK, thirdAirMassStreamRK, secondAirSensibleRK],
         [totalEnteringMassStream, totalEnteringSensible, totalLeavingMassStream, totalLeavingSensible],
-        [systemRatio_RK, Qsh]
+        [systemRatio_RK, Qsh],
+        [
+            organicWasterLiquidBurningSensible,
+            coalPowderBurningSensible
+        ]
     ];
 }
 // 1.进入冷却炉的物质流

@@ -133,14 +133,18 @@ export function fun3(
     let systemRatio_SF = cal_total_sensible_enteringNode(hourlyCoalPowder, hourlyClinkerProduction, coalPowderTemperature, coalPowderSpecificHeat, hourlySendCoalAirVolume,standardAirSpecificHeat, sendCoalAirTemperature, hourlyThirdAirVolume, thirdAirSpecificHeat, thirdAirTemperature, rawMaterialSensibleSP, hourlyLeakageVolume, envTemperature, coalHeatingValue, wasterGasTemperature, carbonMonoxideVolumeFractionWasterGas, carbonDioxideVolumeFractionWasterGas, oxygenVolumeFractionWasterGas, nitrogenVolumeFractionWasterGas, carbonMonoxideSpecificHeatWasterGas, carbonDioxideSpecificHeatWasterGas, oxygenSpecificHeatWasterGas, nitrogenSpecificHeatWasterGas, hourlyOthersMass, othersSpecificHeat, othersTemperature, othersHeatingValue, hourlySecondAirVolume, hourlyFirstAirVolumeRK)[1]
 
     let coalPowderMassStreamSF = cal_coalPowder_massStream_enteringNode(hourlyCoalPowder, hourlyClinkerProduction)
-
-    console.log("ARG", ashMassStreamSP);
+    let othersBurningSensible = cal_othersBurning_sensible_enteringNode(hourlyOthersMass, hourlyClinkerProduction, othersHeatingValue)
+    // console.log("ARG", ashMassStreamSP);
     
     return [
         [massStreamRatio, thermalEfficiency], 
         [outRawMaterialMassStreamSF, rawMaterialSensibleSF, wasterGasMassStreamSF, wasterGasSensibleSF, coalPowderBurningSensible, ashSensibleSP, thirdAirMassStreamSF, coalPowderMassStreamSF, coalHeatingValue], 
         [totalEnteringMassStream, totalEnteringSensible, totalLeavingMassStream, totalLeavingSensible],
-        [systemRatio_SF]
+        [systemRatio_SF],
+        [
+            coalPowderBurningSensible,
+            othersBurningSensible
+        ]
     ];
 }
 // (success)1

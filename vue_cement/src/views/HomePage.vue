@@ -516,6 +516,9 @@ export default {
       let QZS = result_SP[3][0] + result_SF[3][0] + result_RK[3][0] + result_C[3][0]
       let Qsh = result_RK[3][1]
       let systemRatio = Qsh / QZS * 100
+
+      // coal burn
+      let coalBurnRatio = (result_SF[4][1]+result_RK[4][1]) / (result_SF[4][1]+result_RK[4][1] + result_SF[4][0]+result_RK[4][0]) * 100
       switch(this.flow){    
         case "PH_Boiler":
           this.createChart(this.$refs.pieChart1, result_PH[2][0], "PH锅炉物质比")
@@ -531,7 +534,7 @@ export default {
         case "StratifiedFurnace":
           this.createChart(this.$refs.pieChart1, result_RK[0][3], "标准煤耗用量")
           this.createChart(this.$refs.pieChart2, result_SF[0][1], "分解炉热效率")
-          this.createChart(this.$refs.pieChart3, (100 - result_SF[0][1]), "分解炉热损失")
+          this.createChart(this.$refs.pieChart3, coalBurnRatio, "燃料替代率")
           break
         case "RotaryKiln":
 
